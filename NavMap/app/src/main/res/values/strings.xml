@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">NavMap</string>
+    <string name="title_activity_nav_main">NavMain</string>
+    <string name="title_explore">Explore</string>
+    <string name="title_bookmarks">Bookmarks</string>
+    <string name="title_profile">Profile</string>
 </resources>
