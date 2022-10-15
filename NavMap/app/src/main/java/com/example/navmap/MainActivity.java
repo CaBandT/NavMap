@@ -27,6 +27,8 @@ public class MainActivity extends AppCompatActivity {
                 //this is new edit by joel
 
                 //CBT is a functional activity
+
+                //it is also sligltly legal
             }
         });
     }
