@@ -24,7 +24,9 @@ public class MainActivity extends AppCompatActivity {
             {
                 Intent intent = new Intent(MainActivity.this, NavMain.class);
                 startActivity(intent);
-                //test CBT is an activity 
+                //test CBT is an activity
+
+                //this is a change by joel
             }
         });
     }
