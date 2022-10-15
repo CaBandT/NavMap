@@ -26,7 +26,8 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
                 //test CBT is an activity
 
-                //this is a change by joel
+
+                //edit by joel
             }
         });
     }
