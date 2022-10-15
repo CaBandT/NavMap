@@ -24,9 +24,6 @@ public class MainActivity extends AppCompatActivity {
             {
                 Intent intent = new Intent(MainActivity.this, NavMain.class);
                 startActivity(intent);
-
-                
-              
             }
         });
     }
