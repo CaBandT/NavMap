@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -33,5 +34,7 @@ public class ExploreFragment extends Fragment {
         fragmentMsg = activity.findViewById(R.id.text_explore);
 
         fragmentMsg.setText("This is the explore fragment.");
+
+        Toast.makeText(activity, "", Toast.LENGTH_SHORT).show();
     }
 }
