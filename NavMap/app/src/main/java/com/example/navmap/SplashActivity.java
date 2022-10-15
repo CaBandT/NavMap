@@ -23,6 +23,10 @@ public class SplashActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().hide();
+        }
+
         mAuth = FirebaseAuth.getInstance();
         FirebaseUser mUser = mAuth.getCurrentUser();
 
@@ -41,9 +45,12 @@ public class SplashActivity extends AppCompatActivity {
                 if (mUser!=null)
                 {
                     //go to main activity
-                    intent = new Intent(SplashActivity.this,NavMain.class);
+                    //intent = new Intent(SplashActivity.this,NavMain.class);
+                    //temp no stay signed in
+                    intent = new Intent(SplashActivity.this,LoginActivity.class);
+                    mAuth.signOut();
                 } else{
-                    //go to landing
+                    //go to login
                     intent = new Intent(SplashActivity.this,LoginActivity.class);
                 }
                 startActivity(intent);

@@ -78,7 +78,7 @@
         android:layout_above="@id/registerTextView"
         android:layout_marginHorizontal="100dp"
         android:layout_marginBottom="30dp"
-        android:backgroundTint="#35ED4A"
+        android:backgroundTint="@color/lime"
         android:fontFamily="sans-serif-medium"
         android:onClick="loginOnClick"
         android:text="@string/login"

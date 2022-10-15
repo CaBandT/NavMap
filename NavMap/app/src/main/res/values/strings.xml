@@ -22,4 +22,8 @@
     <string name="forgot_password">Forgot Password?</string>
     <string name="welcome_to_navmap">Welcome to NavMap!</string>
     <string name="new_register_here">New? Register Here!</string>
+    <string name="name">Name</string>
+    <string name="back_to_login">Back to login?</string>
+    <string name="register">Register</string>
+    <string name="confirm_password">Confirm Password</string>
 </resources>
