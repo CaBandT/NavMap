@@ -31,6 +31,6 @@ public class ExploreFragment extends Fragment {
 
         fragmentMsg = activity.findViewById(R.id.text_explore);
 
-        fragmentMsg.setText("This is the explore fragment.");
+        fragmentMsg.setText("This is the CBT fragment.");
     }
 }

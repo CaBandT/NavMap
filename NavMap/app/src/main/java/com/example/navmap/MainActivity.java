@@ -24,11 +24,6 @@ public class MainActivity extends AppCompatActivity {
             {
                 Intent intent = new Intent(MainActivity.this, NavMain.class);
                 startActivity(intent);
-                //this is new edit by joel
-
-                //CBT is a functional activity
-
-                //it is also sligltly legal
             }
         });
     }
