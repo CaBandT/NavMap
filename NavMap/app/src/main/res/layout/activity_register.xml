@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/lightGrey"
+    tools:context=".RegisterActivity">
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:backgroundTint="@color/darkGrey">
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/logo"/>
+    </androidx.cardview.widget.CardView>
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_below="@+id/header"
+        android:layout_marginTop="30dp"
+        android:fontFamily="sans-serif-medium"
+        android:text="@string/welcome_to_navmap"
+        android:textAlignment="center"
+        android:textColor="#000000"
+        android:textSize="28sp" />
+
+    <EditText
+        android:id="@+id/registerNameEditText"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:layout_below="@id/title"
+        android:layout_marginTop="30dp"
+        android:layout_marginHorizontal="50dp"
+        android:background="@drawable/rounded_edittext"
+        android:hint="@string/name"
+        android:inputType="textEmailAddress"
+        android:textAlignment="center"
+        android:textColorHint="#757575"
+        android:importantForAutofill="no" />
+
+    <EditText
+        android:id="@+id/registerEmailEditText"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:layout_below="@id/registerNameEditText"
+        android:layout_marginTop="15dp"
+        android:layout_marginHorizontal="50dp"
+        android:background="@drawable/rounded_edittext"
+        android:hint="@string/email"
+        android:inputType="textEmailAddress"
+        android:textAlignment="center"
+        android:textColorHint="#757575"
+        android:importantForAutofill="no" />
+
+    <EditText
+        android:id="@+id/registerPasswordEditText"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:layout_below="@+id/registerEmailEditText"
+        android:layout_marginTop="15dp"
+        android:layout_marginHorizontal="50dp"
+        android:background="@drawable/rounded_edittext"
+        android:hint="@string/password"
+        android:inputType="textPassword"
+        android:textAlignment="center"
+        android:textColorHint="#757575"
+        android:importantForAutofill="no" />
+
+    <EditText
+        android:id="@+id/registerConfirmPasswordEditText"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:layout_below="@+id/registerPasswordEditText"
+        android:layout_marginTop="15dp"
+        android:layout_marginHorizontal="50dp"
+        android:background="@drawable/rounded_edittext"
+        android:hint="@string/confirm_password"
+        android:inputType="textPassword"
+        android:textAlignment="center"
+        android:textColorHint="#757575"
+        android:importantForAutofill="no" />
+
+
+    <Button
+        android:id="@+id/registerBtn"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:layout_above="@id/backToLoginTextView"
+        android:layout_marginHorizontal="100dp"
+        android:layout_marginBottom="20dp"
+        android:backgroundTint="@color/lime"
+        android:fontFamily="sans-serif-medium"
+        android:onClick="registerOnClick"
+        android:text="@string/register"
+        android:textAllCaps="false"
+        android:textColor="@color/black"
+        android:textSize="18sp"
+        app:cornerRadius="50dp"/>
+
+    <TextView
+        android:id="@+id/backToLoginTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginHorizontal="100dp"
+        android:layout_marginBottom="40dp"
+        android:text="@string/back_to_login"
+        android:onClick="goToLoginOnClick"
+        android:textColor="#616161"
+        android:textSize="16sp"
+        android:textAlignment="center"/>
+
+</RelativeLayout>
