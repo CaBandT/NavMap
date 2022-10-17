@@ -28,8 +28,6 @@ public class BookmarksFragment extends Fragment {
     public void onStart() {
         super.onStart();
 
-        fragmentMsg = activity.findViewById(R.id.text_bookmarks);
 
-        fragmentMsg.setText("This is the bookmarks fragment.");
     }
 }
