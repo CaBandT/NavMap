@@ -86,16 +86,38 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
         activity = getActivity();
-        return inflater.inflate(R.layout.fragment_explore, container, false);
 
-        super.onCreate(savedInstanceState);
-        Mapbox.getInstance(this, getString(R.string.mapbox_access_token));
+
+        Mapbox.getInstance(activity, getString(R.string.mapbox_access_token));
         activity.setContentView(R.layout.fragment_explore);
 
-        mapView = mapView.findViewById(R.id.fragment_explore);
+       //Mapbox.getInstance(activity, getString(R.string.mapbox_access_token));
+       // mapView.onCreate(savedInstanceState);
+
+        return inflater.inflate(R.layout.fragment_explore, container, false);
+
+       // activity.setContentView(R.layout.fragment_explore);
+
+        //mapView = activity.findViewById(R.id.mapView);
+        //mapView = mapView.findViewById(R.id.fragment_explore);
+
+       // mapView.getMapAsync(this);
+    }
+
+
+    public void onStart(@NonNull Bundle savedInstanceState) {
+
+        super.onStart();
+
+        activity.setContentView(R.layout.fragment_explore);
+
+        mapView = activity.findViewById(R.id.mapView);
+
         mapView.onCreate(savedInstanceState);
+
         mapView.getMapAsync(this);
     }
 
@@ -107,7 +129,7 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
             addDestinationIconSymbolLayer(style);
             mapboxMap.addOnMapClickListener(this);
 
-            btnStartNavigation = btnStartNavigation.findViewById(R.id.btnStart);
+            btnStartNavigation = activity.findViewById(R.id.btnStart);
             btnStartNavigation.setOnClickListener(v -> {
                 boolean simulateRoute = false;
                 NavigationLauncherOptions options = NavigationLauncherOptions.builder()
@@ -116,7 +138,7 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
                         .build();
 
                 // Call this method with Context from within an activity
-                NavigationLauncher.startNavigation(this, options);
+                NavigationLauncher.startNavigation(activity, options);
             });
 
             initSearchFab();
@@ -142,7 +164,7 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
     }
 
     private void initSearchFab() {
-        fabLocationSearch = fabLocationSearch.findViewById(R.id.fab_location_search);
+        fabLocationSearch = activity.findViewById(R.id.fab_location_search);
         fabLocationSearch.setOnClickListener(view -> {
             Intent intent = new PlaceAutocomplete.IntentBuilder()
                     .accessToken(Mapbox.getAccessToken() != null ? Mapbox.getAccessToken() : getString(R.string.mapbox_access_token))
@@ -150,7 +172,7 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
                             .backgroundColor(Color.parseColor("#EEEEEE"))
                             .limit(10)
                             .build(PlaceOptions.MODE_CARDS))
-                    .build(this);
+                    .build(activity);
 
             startActivityForResult(intent, REQUEST_CODE_AUTOCOMPLETE);
         });
@@ -217,7 +239,7 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
     }
 
     private void getRoute(Point origin, Point destination) {
-        NavigationRoute.builder(this)
+        NavigationRoute.builder(activity)
                 .accessToken(Mapbox.getAccessToken())
                 .origin(origin)
                 .destination(destination)
@@ -258,11 +280,11 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
     }
 
     private void enableLocationComponent(Style loadedMapStyle) {
-        if (PermissionsManager.areLocationPermissionsGranted(this)) {
+        if (PermissionsManager.areLocationPermissionsGranted(activity)) {
             Log.d(TAG, "Location should be showing");
             locationComponent = mapboxMap.getLocationComponent();
-            locationComponent.activateLocationComponent(this, loadedMapStyle);
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            locationComponent.activateLocationComponent(activity, loadedMapStyle);
+            if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 // TODO: Consider calling
                 //    ActivityCompat#requestPermissions
                 // here to request the missing permissions, and then overriding
@@ -279,14 +301,14 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
         } else
         {
             permissionsManager = new PermissionsManager(this);
-            permissionsManager.requestLocationPermissions(this);
+            permissionsManager.requestLocationPermissions(activity);
             Log.d(TAG, "Location permission not granted");
         }
     }
 
     @Override
     public void onExplanationNeeded(List<String> list) {
-        Toast.makeText(this,"test", Toast.LENGTH_SHORT).show();
+        Toast.makeText(activity,R.string.user_location_permission_explanation, Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -294,8 +316,8 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
         if (granted){
             enableLocationComponent(mapboxMap.getStyle());
         } else {
-            Toast.makeText(this, R.string.user_location_permission_not_granted, Toast.LENGTH_SHORT).show();
-            finish();
+            Toast.makeText(activity, R.string.user_location_permission_not_granted, Toast.LENGTH_SHORT).show();
+            //finish();
         }
     }
 
@@ -305,12 +327,43 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
         permissionsManager.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
+   /* @Override
+    public void onResume() {
+        super.onResume();
+        mapView.onResume();
+    }*/
+
+    /*@Override
+    public  void onPause() {
+        super.onPause();
+        mapView.onPause();
+    }*/
+
+    /*@Override
+    public  void onStop() {
+        super.onStop();
+        mapView.onStop();
+    }*/
 
     @Override
-    public void onStart() {
-        super.onStart();
-
+    public  void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        mapView.onSaveInstanceState(outState);
     }
+
+   /* @Override
+    public  void onDestroy() {
+        super.onDestroy();
+        mapView.onDestroy();
+    }*/
+
+    /*@Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        mapView.onLowMemory();
+    }
+*/
+
 
 
 }
