@@ -69,6 +69,7 @@ import retrofit2.Response;
 public class ExploreFragment extends Fragment implements OnMapReadyCallback, PermissionsListener, MapboxMap.OnMapClickListener {
 
     private Activity activity;
+    private Bundle _savedInstanceState;
     TextView fragmentMsg;
     private static final int REQUEST_CODE_AUTOCOMPLETE = 7171;
     private MapView mapView;
@@ -86,37 +87,29 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
 
         activity = getActivity();
 
+        _savedInstanceState = savedInstanceState;
 
         Mapbox.getInstance(activity, getString(R.string.mapbox_access_token));
-        activity.setContentView(R.layout.fragment_explore);
-
-       //Mapbox.getInstance(activity, getString(R.string.mapbox_access_token));
-       // mapView.onCreate(savedInstanceState);
+       // activity.setContentView(R.layout.fragment_explore);
 
         return inflater.inflate(R.layout.fragment_explore, container, false);
 
-       // activity.setContentView(R.layout.fragment_explore);
-
-        //mapView = activity.findViewById(R.id.mapView);
-        //mapView = mapView.findViewById(R.id.fragment_explore);
-
-       // mapView.getMapAsync(this);
     }
 
-
-    public void onStart(@NonNull Bundle savedInstanceState) {
-
+    @Override
+    public void onStart() {
         super.onStart();
 
-        activity.setContentView(R.layout.fragment_explore);
+        //activity.setContentView(R.layout.fragment_explore);
 
         mapView = activity.findViewById(R.id.mapView);
 
-        mapView.onCreate(savedInstanceState);
+        mapView.onCreate(_savedInstanceState);
 
         mapView.getMapAsync(this);
     }
@@ -327,23 +320,23 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
         permissionsManager.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
-   /* @Override
+    @Override
     public void onResume() {
         super.onResume();
         mapView.onResume();
-    }*/
+    }
 
-    /*@Override
+    @Override
     public  void onPause() {
         super.onPause();
         mapView.onPause();
-    }*/
+    }
 
-    /*@Override
+    @Override
     public  void onStop() {
         super.onStop();
         mapView.onStop();
-    }*/
+    }
 
     @Override
     public  void onSaveInstanceState(@NonNull Bundle outState) {
@@ -351,18 +344,17 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
         mapView.onSaveInstanceState(outState);
     }
 
-   /* @Override
+    @Override
     public  void onDestroy() {
         super.onDestroy();
         mapView.onDestroy();
-    }*/
+    }
 
-    /*@Override
+    @Override
     public void onLowMemory() {
         super.onLowMemory();
         mapView.onLowMemory();
     }
-*/
 
 
 
