@@ -69,6 +69,9 @@ public class ProfileFragment extends Fragment {
         landmarkSpinner = activity.findViewById(R.id.landmarkSpinner);
         imperialSwitch = activity.findViewById(R.id.unitsToggle);
 
+        landmarkPreference = "";
+        measurementSystem = "";
+
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
         db = FirebaseFirestore.getInstance();
