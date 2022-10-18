@@ -29,4 +29,10 @@
     <string name="start_navigation">Start Navigation</string>
     <string name="user_location_permission_explanation">This app needs access to your location in order to function.</string>
     <string name="user_location_permission_not_granted">You didn\'t grant location permissions.</string>
+    <string name="search_button">Search Button</string>
+    <string name="focus_on_user_location_button">Focus on User Location Button</string>
+    <string name="layer_menu_button">Layer Menu Button</string>
+    <string name="toggle_satellite_view_button">Toggle Satellite View Button</string>
+    <string name="toggle_traffic_view_button">Toggle Traffic View Button</string>
+    <string name="toggle_street_view_button">Toggle Street View Button</string>
 </resources>

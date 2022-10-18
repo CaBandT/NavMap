@@ -6,7 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".ui.ExploreFragment">
+    tools:context=".ui.ExploreFragment"
+    android:paddingBottom="57dp">
 
     <com.mapbox.mapboxsdk.maps.MapView
         android:id="@+id/mapView"
@@ -14,39 +15,109 @@
         android:layout_width="match_parent"
         mapbox:mapbox_cameraZoom="12"/>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+    <Button
+        android:id="@+id/btnStart"
+        android:layout_width="wrap_content"
+        android:layout_height="68dp"
+        android:enabled="false"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="10dp"
+        android:layout_marginEnd="72dp"
+        android:textAllCaps="false"
+        android:textSize="18sp"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="41dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignEnd="@+id/fab_location_search"
+        android:text="@string/start_navigation"
+        app:cornerRadius="50dp"/>
 
-        android:orientation="horizontal"
-        android:weightSum="10">
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_location_search"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        mapbox:borderWidth="0dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:backgroundTint="@color/white"
+        app:srcCompat="@android:drawable/ic_search_category_default"
+        app:tint="@color/darkGreen"
+        android:contentDescription="@string/search_button" />
 
-        <Button
-            android:id="@+id/btnStart"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:background="@color/cardview_light_background"
-            android:enabled="false"
-            android:layout_weight="8"
-            android:layout_marginStart="24dp"
-            android:layout_marginTop="24dp"
-            android:layout_marginBottom="20dp"
-            android:text="START NAVIGATION"/>
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabGoToLocation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:clickable="true"
+        android:focusable="true"
+        mapbox:borderWidth="0dp"
+        android:layout_above="@id/fab_location_search"
+        android:layout_alignEnd="@id/fab_location_search"
+        android:backgroundTint="@color/white"
+        mapbox:srcCompat="@drawable/ic_location"
+        app:tint="@color/darkGreen"
+        android:contentDescription="@string/focus_on_user_location_button" />
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab_location_search"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end|bottom"
-            android:layout_margin="16dp"
-            android:layout_weight="2"
-            android:tint="@color/white"
-            android:backgroundTint="@color/design_default_color_primary"
-            app:srcCompat="@android:drawable/ic_search_category_default"/>
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabLayerMenu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:clickable="true"
+        android:focusable="true"
+        mapbox:borderWidth="0dp"
+        android:layout_above="@id/fabGoToLocation"
+        android:layout_alignEnd="@+id/fabGoToLocation"
+        android:backgroundTint="@color/white"
+        mapbox:srcCompat="@drawable/ic_layers"
+        app:tint="@color/darkGreen"
+        android:contentDescription="@string/layer_menu_button" />
 
-    </LinearLayout>
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabSatellite"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        mapbox:borderWidth="0dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:visibility="invisible"
+        android:enabled="false"
+        android:layout_above="@+id/fabTraffic"
+        android:layout_alignEnd="@+id/fabTraffic"
+        mapbox:srcCompat="@drawable/ic_satellite"
+        android:contentDescription="@string/toggle_satellite_view_button" />
 
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabTraffic"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        mapbox:borderWidth="0dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:visibility="invisible"
+        android:enabled="false"
+        android:layout_above="@+id/fabStreet"
+        android:layout_alignEnd="@+id/fabStreet"
+        mapbox:srcCompat="@drawable/ic_traffic"
+        android:contentDescription="@string/toggle_traffic_view_button" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabStreet"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        mapbox:borderWidth="0dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:visibility="invisible"
+        android:enabled="false"
+        android:layout_above="@+id/fabLayerMenu"
+        android:layout_alignEnd="@+id/fabLayerMenu"
+        mapbox:srcCompat="@drawable/ic_street"
+        android:contentDescription="@string/toggle_street_view_button" />
 </RelativeLayout>
