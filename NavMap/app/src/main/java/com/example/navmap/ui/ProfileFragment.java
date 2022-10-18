@@ -133,6 +133,9 @@ public class ProfileFragment extends Fragment {
         if (imperialSwitch.isChecked() && measurementSystem.equals("Metric")){
             measurementSystem = "Imperial";
             updateFS = true;
+        } else if ((!imperialSwitch.isChecked()) && measurementSystem.equals("Imperial")){
+            measurementSystem = "Metric";
+            updateFS = true;
         }
 
         String spinnerSelection = landmarkSpinner.getSelectedItem().toString();
