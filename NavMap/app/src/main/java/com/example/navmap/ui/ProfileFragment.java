@@ -11,24 +11,46 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.navmap.LoginActivity;
 import com.example.navmap.R;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ProfileFragment extends Fragment {
 
     private Activity activity;
 
-    Spinner spinner;
-    TextView Nametxt, Emailtxt;
-    Button logout;
-    FirebaseAuth auth;
-    FirebaseUser user;
+    Spinner landmarkSpinner;
+    SwitchCompat imperialSwitch;
+    TextView nameTV, emailTV;
+    Button logout, save;
+
+    private FirebaseAuth auth;
+    private FirebaseUser user;
+    private FirebaseFirestore db;
+    private AlertDialog.Builder alertBuilder;
+
+    String landmarkPreference, measurementSystem;
+
+    private static final String TAG = "ProfileFragment";
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -42,29 +64,57 @@ public class ProfileFragment extends Fragment {
         super.onStart();
 
         logout = activity.findViewById(R.id.btnLogout);
-        spinner = activity.findViewById(R.id.spinner);
+        save = activity.findViewById(R.id.btnSave);
 
-        activity = getActivity();
+        landmarkSpinner = activity.findViewById(R.id.landmarkSpinner);
+        imperialSwitch = activity.findViewById(R.id.unitsToggle);
 
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
+        db = FirebaseFirestore.getInstance();
 
         if (user != null) {
-            Nametxt = activity.findViewById(R.id.displayName);
-            Emailtxt = activity.findViewById(R.id.displayEmail);
+            nameTV = activity.findViewById(R.id.displayName);
+            emailTV = activity.findViewById(R.id.displayEmail);
             // Name, email address, and profile photo Url
 
             String name = auth.getCurrentUser().getDisplayName();
-            Log.d("Profile name", "name: " + name);
             String email = user.getEmail();
-            Uri photoUrl = user.getPhotoUrl();
-            Emailtxt.setText(email);
-            Nametxt.setText(name);
-            boolean emailVerified = user.isEmailVerified();
+            emailTV.setText(email);
+            nameTV.setText(name);
 
-            String uid = user.getUid();
+            //read settings
+            db.collection("users")
+                    .document(user.getUid())
+                    .get()
+                    .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                            if(task.isSuccessful()){
+                                DocumentSnapshot document = task.getResult();
+                                if (document.exists()){
+                                    Log.d("Profile", document.getId() + " => " + document.getData());
+                                    landmarkPreference = document.get("landmarkPreference").toString();
+                                    measurementSystem = document.get("measurementSystem").toString();
 
+                                    showUserSettings();
+                                } else
+                                {
+                                    simpleAlert("Connection Error",
+                                            "Unable to retrieve your settings. Please try again later.");
+                                    Log.w("Profile", "Unable to retrieve data!");
+                                }
+                            }
+                        }
+                    });
         }
+
+        save.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                updateUserSettings();
+            }
+        });
 
         logout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -75,5 +125,85 @@ public class ProfileFragment extends Fragment {
                 activity.finish();
             }
         });
+    }
+
+    private void updateUserSettings() {
+        boolean updateFS = false;
+
+        if (imperialSwitch.isChecked() && measurementSystem.equals("Metric")){
+            measurementSystem = "Imperial";
+            updateFS = true;
+        } else if ((!imperialSwitch.isChecked()) && measurementSystem.equals("Imperial")){
+            measurementSystem = "Metric";
+            updateFS = true;
+        }
+
+        String spinnerSelection = landmarkSpinner.getSelectedItem().toString();
+        if (!spinnerSelection.equals(landmarkPreference)){
+            landmarkPreference = spinnerSelection;
+            updateFS = true;
+        }
+
+        //update fs if necessary
+        if (updateFS){
+            try {
+                Map<String, Object> userSettings = new HashMap<>();
+                userSettings.put("landmarkPreference", landmarkPreference);
+                userSettings.put("measurementSystem", measurementSystem);
+
+                db.collection("users")
+                        .document(user.getUid())
+                        .set(userSettings)
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void unused) {
+                                Log.d(TAG, "Settings successfully saved!");
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.e(TAG, "Error saving settings!");
+                                simpleAlert("Error Saving!",
+                                        "Your settings weren't saved. Please try again later.");
+                            }
+                        });
+            } catch (Exception e){
+                Log.e(TAG, "Error: " + e.getMessage());
+                simpleAlert("Error Saving!",
+                        "Your settings weren't saved. Please try again later.");
+            }
+        }
+    }
+
+    private void showUserSettings() {
+        if (measurementSystem.equals("Imperial")){
+            imperialSwitch.setChecked(true);
+        }
+
+        switch (landmarkPreference){
+            case "Historical":
+                landmarkSpinner.setSelection(1);
+                break;
+            case "Modern":
+                landmarkSpinner.setSelection(2);
+                break;
+            case "Architectural":
+                landmarkSpinner.setSelection(3);
+                break;
+            default:
+                landmarkSpinner.setSelection(0);
+                break;
+        }
+    }
+
+    public void simpleAlert(String title, String message)
+    {
+        alertBuilder.setTitle(title).
+                setMessage(message).
+                setCancelable(false).
+                setPositiveButton("Ok", null);
+
+        alertBuilder.show();
     }
 }
