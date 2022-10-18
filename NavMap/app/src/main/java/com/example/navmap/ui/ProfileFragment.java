@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -99,6 +100,8 @@ public class ProfileFragment extends Fragment {
                                     showUserSettings();
                                 } else
                                 {
+                                    simpleAlert("Connection Error",
+                                            "Unable to retrieve your settings. Please try again later.");
                                     Log.w("Profile", "Unable to retrieve data!");
                                 }
                             }

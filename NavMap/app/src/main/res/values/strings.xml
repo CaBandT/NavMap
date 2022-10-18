@@ -40,6 +40,15 @@
     <string name="settings">Settings</string>
     <string name="logout">Logout</string>
     <string name="save_settings">Save Settings</string>
+    <string name="stacy_s_mom_s_house">Stacy\'s Mom\'s House</string>
+    <string name="_14_point_road_durban">14 Point Road, Durban</string>
+    <string name="_11_15_saint_james_avenue_durban">11-15 Saint James Avenue, Durban</string>
+    <string name="home">Home</string>
+    <string name="work">Work</string>
+    <string name="_4_lagoon_drive_umhlanga">4 Lagoon Drive, Umhlanga</string>
+    <string name="grocery_store">Grocery Store</string>
+    <string name="_18_augusta_road_berea">18 Augusta Road, Berea</string>
+    <string name="navigate_to_bookmark">Navigate to Bookmark</string>
 
     <string-array name="landmarksTypes">
         <item>Any</item>

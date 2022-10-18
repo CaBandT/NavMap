@@ -10,46 +10,41 @@
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:layout_marginTop="10dp"
+        android:layout_height="80dp"
+        android:layout_marginTop="15dp"
         android:layout_marginHorizontal="15dp"
-        app:cardCornerRadius="20dp"
-        >
+        app:cardCornerRadius="20dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:layout_margin="9dp"
-            >
-
+            android:layout_margin="9dp">
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_weight="0.7"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
-                >
+                android:gravity="center_vertical">
 
                 <TextView
                     android:layout_width="wrap_content"
-                    android:layout_height="35dp"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginTop="12dp"
-                    android:layout_marginRight="20dp"
-                    android:textSize="20dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="20dp"
+                    android:textSize="18sp"
                     android:textColor="@color/black"
-                    android:text="Stacy's Mom's House"
+                    android:text="@string/stacy_s_mom_s_house"
                     android:fontFamily="sans-serif-medium"/>
 
 
                 <TextView
                     android:layout_width="match_parent"
-                    android:layout_height="25dp"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginTop="0dp"
-                    android:textSize="18dp"
-                    android:text="14 Point Road, Durban" />
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:textSize="16sp"
+                    android:text="@string/_14_point_road_durban" />
 
             </LinearLayout>
 
@@ -59,7 +54,9 @@
                 android:src="@drawable/bookmark_arrow"
                 android:layout_weight="0.15"
                 android:backgroundTint="@color/darkGreen"
-                android:text="Temp" />
+                android:scaleX=".8"
+                android:scaleY=".8"
+                android:contentDescription="@string/navigate_to_bookmark" />
 
         </LinearLayout>
 
@@ -68,45 +65,40 @@
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:layout_marginTop="10dp"
+        android:layout_height="80dp"
+        android:layout_marginTop="15dp"
         android:layout_marginHorizontal="15dp"
-        app:cardCornerRadius="20dp"
-        >
+        app:cardCornerRadius="20dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:layout_margin="9dp"
-            >
+            android:layout_margin="9dp">
 
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_weight="0.7"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
-                >
+                android:gravity="center_vertical">
 
                 <TextView
                     android:layout_width="wrap_content"
-                    android:layout_height="35dp"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginTop="12dp"
-                    android:layout_marginRight="20dp"
-                    android:textSize="20dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:textSize="18sp"
                     android:textColor="@color/black"
-                    android:text="Home"
+                    android:text="@string/home"
                     android:fontFamily="sans-serif-medium"/>
 
                 <TextView
                     android:layout_width="match_parent"
-                    android:layout_height="25dp"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginTop="0dp"
-                    android:textSize="18dp"
-                    android:text="11-15 Saint James Avenue, Durban"/>
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:textSize="16sp"
+                    android:text="@string/_11_15_saint_james_avenue_durban"/>
 
             </LinearLayout>
 
@@ -116,7 +108,9 @@
                 android:src="@drawable/bookmark_arrow"
                 android:layout_weight="0.15"
                 android:backgroundTint="@color/darkGreen"
-                android:text="Temp" />
+                android:scaleX=".8"
+                android:scaleY=".8"
+                android:contentDescription="@string/navigate_to_bookmark" />
 
         </LinearLayout>
 
@@ -125,45 +119,40 @@
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:layout_marginTop="10dp"
+        android:layout_height="80dp"
+        android:layout_marginTop="15dp"
         android:layout_marginHorizontal="15dp"
-        app:cardCornerRadius="20dp"
-        >
+        app:cardCornerRadius="20dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:layout_margin="9dp"
-            >
+            android:layout_margin="9dp">
 
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_weight="0.7"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
-                >
+                android:gravity="center_vertical">
 
                 <TextView
                     android:layout_width="wrap_content"
-                    android:layout_height="35dp"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginTop="12dp"
-                    android:layout_marginRight="20dp"
-                    android:textSize="20dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:textSize="18sp"
                     android:textColor="@color/black"
-                    android:text="Work"
+                    android:text="@string/work"
                     android:fontFamily="sans-serif-medium"/>
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="25dp"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginTop="0dp"
-                    android:textSize="18dp"
-                    android:text="4 Lagoon Drive, Umhlanga"/>
+                    android:layout_marginStart="10dp"
+                    android:textSize="16sp"
+                    android:text="@string/_4_lagoon_drive_umhlanga"/>
 
             </LinearLayout>
 
@@ -173,7 +162,9 @@
                 android:src="@drawable/bookmark_arrow"
                 android:layout_weight="0.15"
                 android:backgroundTint="@color/darkGreen"
-                android:text="Temp" />
+                android:scaleX=".8"
+                android:scaleY=".8"
+                android:contentDescription="@string/navigate_to_bookmark" />
 
         </LinearLayout>
 
@@ -181,46 +172,41 @@
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:layout_marginTop="10dp"
+        android:layout_height="80dp"
+        android:layout_marginTop="15dp"
         android:layout_marginHorizontal="15dp"
-        app:cardCornerRadius="20dp"
-        >
+        app:cardCornerRadius="20dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:layout_margin="9dp"
-            >
+            android:layout_margin="9dp">
 
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_weight="0.7"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
-                >
+                android:gravity="center_vertical">
 
                 <TextView
                     android:layout_width="wrap_content"
-                    android:layout_height="35dp"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginTop="12dp"
-                    android:layout_marginRight="20dp"
-                    android:textSize="20dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:textSize="18sp"
                     android:textColor="@color/black"
-                    android:text="Grocery Store"
+                    android:text="@string/grocery_store"
                     android:fontFamily="sans-serif-medium"/>
 
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="25dp"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginTop="0dp"
-                    android:textSize="18dp"
-                    android:text="18 Augusta Road, Berea" />
+                    android:layout_marginStart="10dp"
+                    android:textSize="16sp"
+                    android:text="@string/_18_augusta_road_berea" />
 
             </LinearLayout>
 
@@ -230,7 +216,9 @@
                 android:src="@drawable/bookmark_arrow"
                 android:layout_weight="0.15"
                 android:backgroundTint="@color/darkGreen"
-                android:text="Temp" />
+                android:scaleX=".8"
+                android:scaleY=".8"
+                android:contentDescription="@string/navigate_to_bookmark" />
 
         </LinearLayout>
 
