@@ -35,4 +35,11 @@
     <string name="toggle_satellite_view_button">Toggle Satellite View Button</string>
     <string name="toggle_traffic_view_button">Toggle Traffic View Button</string>
     <string name="toggle_street_view_button">Toggle Street View Button</string>
+
+    <string-array name="landmarksTypes">
+        <item>Any</item>
+        <item>Historical</item>
+        <item>Modern</item>
+        <item>Architectural</item>
+    </string-array>
 </resources>

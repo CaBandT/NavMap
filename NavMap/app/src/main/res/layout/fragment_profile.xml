@@ -1,22 +1,143 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.ProfileFragment">
+    android:background="@color/lightGrey"
+    android:orientation="vertical"
+    tools:context=".ui.BookmarksFragment"
+    android:paddingBottom="57dp">
+
+    <ImageView
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@drawable/ic_user_profile"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="20dp"/>
 
     <TextView
-        android:id="@+id/text_profile"
+        android:id="@+id/displayName"
+        android:layout_width="wrap_content"
+        android:layout_height="35dp"
+        android:text="Name"
+        android:fontFamily="sans-serif-medium"
+        android:textSize="25sp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"
+        android:textColor="@color/black"/>
+
+    <TextView
+        android:id="@+id/displayEmail"
+        android:layout_width="wrap_content"
+        android:layout_height="35dp"
+        android:layout_gravity="center_horizontal"
+        android:fontFamily="sans-serif"
+        android:text="Email"
+        android:textSize="18sp"/>
+
+    <TextView
+        android:layout_width="100dp"
+        android:layout_height="25dp"
+        android:layout_marginLeft="25dp"
+        android:text="Settings"
+        android:fontFamily="sans-serif-medium"
+        android:textSize="18sp" />
+
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:textAlignment="center"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+        android:layout_height="80dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginHorizontal="15dp"
+        app:cardCornerRadius="20dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_margin="9dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:layout_marginTop="0dp"
+                android:layout_marginBottom="0dp"
+                android:layout_marginRight="20dp"
+                android:textSize="20dp"
+                android:textColor="@color/black"
+                android:text="Use Imperial System"
+                android:fontFamily="sans-serif-medium"/>
+
+            <Switch
+                android:layout_width="45dp"
+                android:layout_height="15dp"
+                android:scaleX="1.5"
+                android:scaleY="1.5"
+                android:layout_marginLeft="75dp"
+                />
+
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="85dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginHorizontal="15dp"
+        app:cardCornerRadius="20dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="10dp"
+            android:textSize="20sp"
+            android:textColor="@color/black"
+            android:text="Preferred Type of landmark:"
+            android:fontFamily="sans-serif-medium"/>
+
+        <Spinner
+            android:id="@+id/spinner"
+            android:layout_width="200dp"
+            android:layout_height="30dp"
+            android:layout_marginStart="50dp"
+            android:layout_gravity="end|bottom"
+            android:entries="@array/landmarksTypes"
+            android:spinnerMode="dropdown"
+            android:layout_marginEnd="15dp"
+            android:layout_marginBottom="10dp"/>
+    </androidx.cardview.widget.CardView>
+
+
+    <Button
+        android:id="@+id/btnSave"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:layout_marginHorizontal="100dp"
+        android:layout_marginTop="45dp"
+        android:layout_marginBottom="15dp"
+        android:backgroundTint="@color/lime"
+        android:fontFamily="sans-serif-medium"
+        android:text="SAVE SETTINGS"
+        android:textAllCaps="false"
+        android:textColor="@color/black"
+        android:textSize="18sp"
+        app:cornerRadius="50dp" />
+
+    <Button
+        android:id="@+id/btnLogout"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:layout_marginHorizontal="100dp"
+        android:layout_marginBottom="25dp"
+        android:backgroundTint="@color/lime"
+        android:fontFamily="sans-serif-medium"
+        android:onClick="OnClick"
+        android:text="LOG OUT"
+        android:textAllCaps="false"
+        android:textColor="@color/black"
+        android:textSize="18sp"
+        app:cornerRadius="50dp" />
+</LinearLayout>
