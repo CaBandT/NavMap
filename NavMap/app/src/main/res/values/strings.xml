@@ -29,4 +29,11 @@
     <string name="start_navigation">Start Navigation</string>
     <string name="user_location_permission_explanation">This app needs access to your location in order to function.</string>
     <string name="user_location_permission_not_granted">You didn\'t grant location permissions.</string>
+    <string-array name="landmarksTypes">
+        <item>Any</item>
+        <item>Historical</item>
+        <item>Modern</item>
+        <item>Architectural</item>
+    </string-array>
+
 </resources>
