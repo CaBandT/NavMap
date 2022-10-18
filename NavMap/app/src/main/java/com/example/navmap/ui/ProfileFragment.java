@@ -158,6 +158,7 @@ public class ProfileFragment extends Fragment {
                             @Override
                             public void onSuccess(Void unused) {
                                 Log.d(TAG, "Settings successfully saved!");
+                                Toast.makeText(activity, "Settings Saved", Toast.LENGTH_SHORT).show();
                             }
                         })
                         .addOnFailureListener(new OnFailureListener() {
