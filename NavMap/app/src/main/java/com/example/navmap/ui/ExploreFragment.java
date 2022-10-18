@@ -6,9 +6,11 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconOffset;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -18,6 +20,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,6 +30,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 
@@ -70,7 +75,6 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
 
     private Activity activity;
     private Bundle _savedInstanceState;
-    TextView fragmentMsg;
     private static final int REQUEST_CODE_AUTOCOMPLETE = 7171;
     private MapView mapView;
     private MapboxMap mapboxMap;
@@ -79,40 +83,249 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
     private DirectionsRoute currentRoute;
     private NavigationMapRoute navigationMapRoute;
     private Button btnStartNavigation;
-    private FloatingActionButton fabLocationSearch;
+    private FloatingActionButton fabLocationSearch, fabTrackUser;
+
     private String geoJsonSourceLayerId = "GeoJsonSourceLayerId";
     private String symbolIconId = "SymbolIconId";
+
+    //region Variables required for layers
+    //fab buttons
+    private FloatingActionButton fabMenu, fabStreet, fabSatellite, fabTraffic;
+
+    //booleans to keep keep track of active map style
+    private boolean clicked = false;
+    private boolean street = true;
+    private boolean satellite = false;
+    private boolean traffic = false;
+    private boolean locationPerms = false;
+
+    //animations for opening and close fab menu
+    private Animation rotateOpen, rotateClose, fromBottom, toBottom;
+    //endregion
 
     private final String TAG = "fragment_explore";
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
 
         activity = getActivity();
-
         _savedInstanceState = savedInstanceState;
 
         Mapbox.getInstance(activity, getString(R.string.mapbox_access_token));
-       // activity.setContentView(R.layout.fragment_explore);
 
         return inflater.inflate(R.layout.fragment_explore, container, false);
-
     }
 
     @Override
     public void onStart() {
         super.onStart();
 
-        //activity.setContentView(R.layout.fragment_explore);
-
+        //start map
         mapView = activity.findViewById(R.id.mapView);
-
         mapView.onCreate(_savedInstanceState);
-
         mapView.getMapAsync(this);
+
+        //region instantiations and set up required for layers
+        //fab animations
+        rotateOpen = AnimationUtils.loadAnimation(activity, R.anim.rotate_open_anim);
+        rotateClose = AnimationUtils.loadAnimation(activity, R.anim.rotate_close_anim);
+        fromBottom = AnimationUtils.loadAnimation(activity, R.anim.from_bottom_anim);
+        toBottom = AnimationUtils.loadAnimation(activity, R.anim.to_bottom_anim);
+
+        fabMenu = activity.findViewById(R.id.fabLayerMenu);
+        fabStreet = activity.findViewById(R.id.fabStreet);
+        fabSatellite = activity.findViewById(R.id.fabSatellite);
+        fabTraffic = activity.findViewById(R.id.fabTraffic);
+
+        fabTrackUser = activity.findViewById(R.id.fabGoToLocation);
+
+        fabStreet.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(activity, R.color.white)));
+        fabSatellite.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(activity, R.color.grey)));
+        fabTraffic.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(activity, R.color.grey)));
+        //endregion
+
+        //region layer Fab onClickListeners
+        fabMenu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onMenuButtonClicked();
+            }
+        });
+        fabStreet.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (street)
+                    streetOff();
+                else
+                    streetOn();
+            }
+        });
+        fabSatellite.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (satellite)
+                    satelliteOff();
+                else
+                    satelliteOn();
+            }
+        });
+        fabTraffic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (traffic)
+                    trafficOff();
+                else
+                    trafficOn();
+            }
+        });
+        //endregion
+
+        //region Track Location onClickListener
+        fabTrackUser.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (locationPerms) {
+                    //set the components camera
+                    locationComponent.setCameraMode(CameraMode.TRACKING_GPS_NORTH);
+                } else {
+                    Toast.makeText(activity, "Unable to Track location", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        //endregion
     }
+
+    //region layer methods
+    private void onMenuButtonClicked()
+    {
+        setVisibility(clicked);
+        setAnimation(clicked);
+        clicked = !clicked;
+    }
+
+    private void setVisibility(boolean clicked) {
+        if (!clicked)
+        {
+            fabStreet.setVisibility(View.VISIBLE);
+            fabSatellite.setVisibility(View.VISIBLE);
+            fabTraffic.setVisibility(View.VISIBLE);
+
+            fabStreet.setEnabled(true);
+            fabSatellite.setEnabled(true);
+            fabTraffic.setEnabled(true);
+        } else
+        {
+            fabStreet.setVisibility(View.INVISIBLE);
+            fabSatellite.setVisibility(View.INVISIBLE);
+            fabTraffic.setVisibility(View.INVISIBLE);
+
+            fabStreet.setEnabled(false);
+            fabSatellite.setEnabled(false);
+            fabTraffic.setEnabled(false);
+        }
+    }
+
+    private void setAnimation(boolean clicked) {
+        if (!clicked)
+        {
+            fabStreet.startAnimation(fromBottom);
+            fabSatellite.startAnimation(fromBottom);
+            fabTraffic.startAnimation(fromBottom);
+            fabMenu.startAnimation(rotateOpen);
+        } else
+        {
+            fabStreet.startAnimation(toBottom);
+            fabSatellite.startAnimation(toBottom);
+            fabTraffic.startAnimation(toBottom);
+            fabMenu.startAnimation(rotateClose);
+        }
+    }
+
+    private void changeMapStyle(int val)
+    {
+        mapView.getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(@NonNull MapboxMap mapboxMap) {
+                switch (val)
+                {
+                    case 1: mapboxMap.setStyle(Style.SATELLITE_STREETS); break;
+                    case 2: mapboxMap.setStyle(Style.SATELLITE); break;
+                    case 3: mapboxMap.setStyle(Style.TRAFFIC_DAY); break;
+                    default: mapboxMap.setStyle(Style.MAPBOX_STREETS); break;
+                }
+            }
+        });
+    }
+
+    //region methods to enable and disable layers
+    private void streetOff()
+    {
+        if (satellite) {
+            street = false;
+            fabStreet.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(activity, R.color.grey)));
+            changeMapStyle(2);
+        }
+    }
+
+    private void streetOn()
+    {
+        street = true;
+        fabStreet.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(activity, R.color.white)));
+
+        if (satellite)
+            changeMapStyle(1);
+        else
+            changeMapStyle(0);
+    }
+
+    private void satelliteOff()
+    {
+        satellite = false;
+        fabSatellite.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(activity, R.color.grey)));
+
+        street = true;
+        fabStreet.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(activity, R.color.white)));
+
+        changeMapStyle(0);
+    }
+
+    private void satelliteOn()
+    {
+        satellite = true;
+        fabSatellite.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(activity, R.color.white)));
+
+        street = true;
+        fabStreet.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(activity, R.color.white)));
+
+        traffic = false;
+        fabTraffic.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(activity, R.color.grey)));
+
+        changeMapStyle(1);
+    }
+
+    private void trafficOff()
+    {
+        traffic = false;
+        fabTraffic.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(activity, R.color.grey)));
+        changeMapStyle(0);
+    }
+
+    private void trafficOn()
+    {
+        traffic = true;
+        fabTraffic.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(activity, R.color.white)));
+
+        street = true;
+        fabStreet.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(activity, R.color.white)));
+
+        satellite = false;
+        fabSatellite.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(activity, R.color.grey)));
+
+        changeMapStyle(3);
+    }
+    //endregion
+    //endregion
 
     @Override
     public void onMapReady(@NonNull MapboxMap mapboxMap) {
@@ -227,7 +440,7 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
 
         getRoute(originPoint, destinationPoint);
         btnStartNavigation.setEnabled(true);
-        btnStartNavigation.setBackgroundResource(R.color.mapboxBlue);
+        btnStartNavigation.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(activity, R.color.darkGreen)));
         return true;
     }
 
@@ -272,21 +485,13 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
                 });
     }
 
+    @SuppressLint("MissingPermission")
     private void enableLocationComponent(Style loadedMapStyle) {
         if (PermissionsManager.areLocationPermissionsGranted(activity)) {
+            locationPerms = true;
             Log.d(TAG, "Location should be showing");
             locationComponent = mapboxMap.getLocationComponent();
             locationComponent.activateLocationComponent(activity, loadedMapStyle);
-            if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
-                return;
-            }
             locationComponent.setLocationComponentEnabled(true);
 
             //set the components camera
