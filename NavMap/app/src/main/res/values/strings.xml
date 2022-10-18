@@ -35,6 +35,11 @@
     <string name="toggle_satellite_view_button">Toggle Satellite View Button</string>
     <string name="toggle_traffic_view_button">Toggle Traffic View Button</string>
     <string name="toggle_street_view_button">Toggle Street View Button</string>
+    <string name="use_imperial_system">Use Imperial System</string>
+    <string name="preferred_type_of_landmark">Preferred type of landmark:</string>
+    <string name="settings">Settings</string>
+    <string name="logout">Logout</string>
+    <string name="save_settings">Save Settings</string>
 
     <string-array name="landmarksTypes">
         <item>Any</item>
