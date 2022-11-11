@@ -83,7 +83,7 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
     private DirectionsRoute currentRoute;
     private NavigationMapRoute navigationMapRoute;
     private Button btnStartNavigation;
-    private FloatingActionButton fabLocationSearch, fabTrackUser;
+    private FloatingActionButton fabLocationSearch, fabTrackUser, fabBookmarkLocation;
 
     private String geoJsonSourceLayerId = "GeoJsonSourceLayerId";
     private String symbolIconId = "SymbolIconId";
@@ -139,10 +139,12 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
         fabTraffic = activity.findViewById(R.id.fabTraffic);
 
         fabTrackUser = activity.findViewById(R.id.fabGoToLocation);
+        fabBookmarkLocation = activity.findViewById(R.id.fabBookmarkLocation);
 
         fabStreet.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(activity, R.color.white)));
         fabSatellite.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(activity, R.color.grey)));
         fabTraffic.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(activity, R.color.grey)));
+        fabBookmarkLocation.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(activity, R.color.semiTransparentGrey)));
         //endregion
 
         //region layer Fab onClickListeners
@@ -194,6 +196,13 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
             }
         });
         //endregion
+        
+        fabBookmarkLocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(activity, "Save Location Here", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     //region layer methods
@@ -439,8 +448,12 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
         }
 
         getRoute(originPoint, destinationPoint);
+        //enable nav btn
         btnStartNavigation.setEnabled(true);
         btnStartNavigation.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(activity, R.color.darkGreen)));
+        //enable
+        fabBookmarkLocation.setEnabled(true);
+        fabBookmarkLocation.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(activity, R.color.white)));
         return true;
     }
 

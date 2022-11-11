@@ -27,12 +27,12 @@
         android:textSize="18sp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true"
-        android:layout_alignEnd="@+id/fab_location_search"
+        android:layout_alignEnd="@+id/fabBookmarkLocation"
         android:text="@string/start_navigation"
         app:cornerRadius="50dp"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_location_search"
+        android:id="@+id/fabBookmarkLocation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         mapbox:borderWidth="0dp"
@@ -40,7 +40,19 @@
         android:layout_alignParentBottom="true"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
+        android:enabled="false"
+        app:srcCompat="@drawable/ic_baseline_star_border_24"
+        app:tint="@color/darkGreen"
+        android:contentDescription="@string/search_button" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_location_search"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        mapbox:borderWidth="0dp"
+        android:layout_marginTop="16dp"
         android:backgroundTint="@color/white"
+        android:layout_alignEnd="@id/fabBookmarkLocation"
         app:srcCompat="@android:drawable/ic_search_category_default"
         app:tint="@color/darkGreen"
         android:contentDescription="@string/search_button" />
@@ -53,8 +65,8 @@
         android:clickable="true"
         android:focusable="true"
         mapbox:borderWidth="0dp"
-        android:layout_above="@id/fab_location_search"
-        android:layout_alignEnd="@id/fab_location_search"
+        android:layout_above="@id/fabBookmarkLocation"
+        android:layout_alignEnd="@id/fabBookmarkLocation"
         android:backgroundTint="@color/white"
         mapbox:srcCompat="@drawable/ic_location"
         app:tint="@color/darkGreen"

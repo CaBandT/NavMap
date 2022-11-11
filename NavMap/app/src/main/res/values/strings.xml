@@ -49,6 +49,7 @@
     <string name="grocery_store">Grocery Store</string>
     <string name="_18_augusta_road_berea">18 Augusta Road, Berea</string>
     <string name="navigate_to_bookmark">Navigate to Bookmark</string>
+    <string name="address">Address</string>
 
     <string-array name="landmarksTypes">
         <item>Any</item>
