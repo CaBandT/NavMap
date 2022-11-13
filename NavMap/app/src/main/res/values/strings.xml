@@ -50,6 +50,8 @@
     <string name="_18_augusta_road_berea">18 Augusta Road, Berea</string>
     <string name="navigate_to_bookmark">Navigate to Bookmark</string>
     <string name="address">Address</string>
+    <string name="no_bookmarks">No bookmarks...</string>
+    <string name="bookmark_something_and_find_it_here">Bookmark something and find it here!</string>
 
     <string-array name="landmarksTypes">
         <item>Any</item>
