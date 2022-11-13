@@ -5,17 +5,20 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconIgnorePlacem
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconOffset;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,19 +26,21 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
-import android.widget.TextView;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.navmap.R;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.api.directions.v5.models.DirectionsResponse;
@@ -64,7 +69,14 @@ import com.mapbox.services.android.navigation.ui.v5.NavigationLauncherOptions;
 import com.mapbox.services.android.navigation.ui.v5.route.NavigationMapRoute;
 import com.mapbox.services.android.navigation.v5.navigation.NavigationRoute;
 
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -85,6 +97,11 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
     private Button btnStartNavigation;
     private FloatingActionButton fabLocationSearch, fabTrackUser, fabBookmarkLocation;
 
+    private LatLng currentPoint;
+    private Geocoder geocoder;
+    private List<Address> addresses;
+    private String selectedAddress = "";
+
     private String geoJsonSourceLayerId = "GeoJsonSourceLayerId";
     private String symbolIconId = "SymbolIconId";
 
@@ -102,6 +119,10 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
     //animations for opening and close fab menu
     private Animation rotateOpen, rotateClose, fromBottom, toBottom;
     //endregion
+
+    private FirebaseAuth mAuth;
+    private FirebaseFirestore db;
+    private String userUid;
 
     private final String TAG = "fragment_explore";
 
@@ -125,6 +146,11 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
         mapView = activity.findViewById(R.id.mapView);
         mapView.onCreate(_savedInstanceState);
         mapView.getMapAsync(this);
+
+        //Firebase instantiations
+        mAuth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
+        userUid = mAuth.getCurrentUser().getUid();
 
         //region instantiations and set up required for layers
         //fab animations
@@ -200,9 +226,64 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
         fabBookmarkLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(activity, "Save Location Here", Toast.LENGTH_SHORT).show();
+                AlertDialog.Builder dialog = new AlertDialog.Builder(activity);
+                dialog.setTitle("Name the bookmark");
+
+                final EditText etBookmarkName = new EditText(activity);
+                etBookmarkName.setInputType(InputType.TYPE_CLASS_TEXT);
+                dialog.setView(etBookmarkName);
+
+                dialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        String name = etBookmarkName.getText().toString();
+                        String lat = "" + currentPoint.getLatitude();
+                        String lng = "" + currentPoint.getLongitude();
+
+                        saveBookmarkToFirebase(name, lat, lng);
+                    }
+                });
+
+                dialog.setNegativeButton("Cancel", null);
+
+                dialog.show();
             }
         });
+    }
+
+    private void saveBookmarkToFirebase(String name, String lat, String lng) {
+        try {
+            Map<String, Object> bookmark = new HashMap<>();
+            bookmark.put("name", name);
+            bookmark.put("lat", lat);
+            bookmark.put("lng", lng);
+
+            db.collection("users")
+                    .document(userUid)
+                    .collection("bookmarks")
+                    .document(UUID.randomUUID() + "_" + name)
+                    .set(bookmark).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void unused) {
+                            Toast.makeText(activity, "Bookmark saved!", Toast.LENGTH_SHORT).show();
+                            Log.d(TAG, "Bookmark saved to Firebase");
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Toast.makeText(activity, "Unable to save Bookmark", Toast.LENGTH_SHORT).show();
+                            Log.w(TAG, "Failed to save Bookmark to Firebase: " + e.getMessage());
+                            e.printStackTrace();
+                        }
+                    });
+
+
+        } catch (Exception e) {
+            Toast.makeText(activity, "Unable to save Bookmark", Toast.LENGTH_SHORT).show();
+            Log.w(TAG, "Unable to save bookmark!");
+            e.printStackTrace();
+        }
     }
 
     //region layer methods
@@ -442,12 +523,16 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
         Point originPoint = Point.fromLngLat(locationComponent.getLastKnownLocation().getLongitude(),
                 locationComponent.getLastKnownLocation().getLatitude());
 
+        currentPoint = point;
+
         GeoJsonSource source = mapboxMap.getStyle().getSourceAs("destination-source-id");
         if (source != null){
             source.setGeoJson(Feature.fromGeometry(destinationPoint));
         }
 
         getRoute(originPoint, destinationPoint);
+        //getAddressAsync(point.getLongitude(), point.getLatitude());
+
         //enable nav btn
         btnStartNavigation.setEnabled(true);
         btnStartNavigation.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(activity, R.color.darkGreen)));
@@ -455,6 +540,25 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
         fabBookmarkLocation.setEnabled(true);
         fabBookmarkLocation.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(activity, R.color.white)));
         return true;
+    }
+
+    private void getAddress(double lat, double lng) {
+        geocoder = new Geocoder(activity, Locale.getDefault());
+        if (lat != 0){
+            try {
+                addresses = geocoder.getFromLocation(lat/100000 , lng/100000 , 1);
+            } catch (IOException e) {
+                Log.e(TAG, "Unable to get location data");
+                e.printStackTrace();
+            }
+
+            if (addresses != null){
+                selectedAddress = addresses.get(0).getAddressLine(0);
+            } else
+            {
+                Toast.makeText(activity, "Address Null", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     private void getRoute(Point origin, Point destination) {
@@ -496,6 +600,47 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
                         Log.e(TAG, "Error: " + t.getMessage());
                     }
                 });
+    }
+
+    private void getAddressAsync(double lat, double lng)
+    {
+        ExecutorService service = Executors.newSingleThreadExecutor();
+        service.execute(new Runnable() {
+            @Override
+            public void run() {
+                //pre-execute
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+
+                    }
+                });
+
+                //background
+                try {
+                    getAddress(lat, lng);
+                } catch (Exception e) {
+                    Log.e(TAG, "Couldn't get address");
+                    e.printStackTrace();
+                }
+
+                //onPost-execute
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (!selectedAddress.isEmpty())
+                        {
+                            Toast.makeText(activity, "Address: " + selectedAddress, Toast.LENGTH_SHORT).show();
+                        } else
+                        {
+                            Toast.makeText(activity, "Address null", Toast.LENGTH_SHORT).show();
+                        }
+
+                        //Toast.makeText(activity, "Got Address", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        });
     }
 
     @SuppressLint("MissingPermission")

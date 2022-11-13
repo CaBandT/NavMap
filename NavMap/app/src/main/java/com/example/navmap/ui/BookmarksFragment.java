@@ -78,8 +78,8 @@ public class BookmarksFragment extends Fragment {
                                 {
                                     Log.d(TAG, document.getId() + " => " + document.getData());
                                     String name = document.get("name").toString();
-                                    String latitude = document.get("latitude").toString();
-                                    String longitude = document.get("longitude").toString();
+                                    String latitude = document.get("lat").toString();
+                                    String longitude = document.get("lng").toString();
 
                                     bookmarkArray.add(new Bookmark(name, latitude, longitude));
                                 }
