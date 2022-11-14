@@ -11,8 +11,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.res.ResourcesCompat;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
@@ -77,6 +79,17 @@ public class BookmarkViewActivity extends AppCompatActivity implements OnMapRead
     private FirebaseFirestore db;
     private String userUid;
 
+    //shared prefs
+    public SharedPreferences sharedPreferences;
+    public static String userpref = "mypref";
+    public static final String unitskey = "unitkey";
+    public static final String landemarkkey = "landmarkpref";
+    public static final String languagekey = "languagepref";
+
+    private String landmarkPreference;
+    private String measurementSystem;
+    private String languagePreference;
+
     private boolean locationPerms = false;
 
     private final String TAG = "BookmarkViewActivity";
@@ -101,6 +114,20 @@ public class BookmarkViewActivity extends AppCompatActivity implements OnMapRead
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
         userUid = mAuth.getCurrentUser().getUid();
+
+        //shared prefs
+        userpref = mAuth.getUid();
+        sharedPreferences = getSharedPreferences(userpref, Context.MODE_PRIVATE);
+
+        try {
+            measurementSystem = sharedPreferences.getString(unitskey,"");
+            landmarkPreference = sharedPreferences.getString(landemarkkey,"");
+            languagePreference = sharedPreferences.getString(languagekey,"");
+        } catch (Exception ex){
+            Log.e(TAG, "Couldn't read ");
+            ex.printStackTrace();
+        }
+
 
         tvName.setText(name);
         tvLat.setText("" + lat);
@@ -218,7 +245,7 @@ public class BookmarkViewActivity extends AppCompatActivity implements OnMapRead
                 .accessToken(Mapbox.getAccessToken())
                 .origin(originPoint)
                 .destination(destinationPoint)
-                .voiceUnits("metric")       //update to use shared prefs
+                .voiceUnits(measurementSystem)
                 .build()
                 .getRoute(new Callback<DirectionsResponse>() {
                     @Override

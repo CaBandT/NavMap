@@ -1,7 +1,9 @@
 package com.example.navmap.ui;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -49,6 +51,13 @@ public class ProfileFragment extends Fragment {
     private FirebaseFirestore db;
     private AlertDialog.Builder alertBuilder;
 
+    public SharedPreferences sharedPreferences;
+
+    public static String userpref = "mypref";
+    public static final String unitskey = "unitkey";
+    public static final String landemarkkey = "landmarkpref";
+    public static final String languagekey = "languagepref";
+
     String landmarkPreference, measurementSystem, languagePreference;
 
     private static final String TAG = "ProfileFragment";
@@ -79,6 +88,9 @@ public class ProfileFragment extends Fragment {
         user = auth.getCurrentUser();
         db = FirebaseFirestore.getInstance();
 
+        userpref = auth.getUid();
+        sharedPreferences = activity.getSharedPreferences(userpref, Context.MODE_PRIVATE);
+
         if (user != null) {
             nameTV = activity.findViewById(R.id.displayName);
             emailTV = activity.findViewById(R.id.displayEmail);
@@ -90,7 +102,13 @@ public class ProfileFragment extends Fragment {
             nameTV.setText(name);
 
             //read settings
-            db.collection("users")
+            landmarkPreference = sharedPreferences.getString(landemarkkey,"");
+            measurementSystem = sharedPreferences.getString(unitskey,"");
+            languagePreference = sharedPreferences.getString(languagekey,"");
+
+            showUserSettings();
+
+            /*db.collection("users")
                     .document(user.getUid())
                     .get()
                     .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -113,7 +131,7 @@ public class ProfileFragment extends Fragment {
                                 }
                             }
                         }
-                    });
+                    });*/
         }
 
         save.setOnClickListener(new View.OnClickListener() {
@@ -171,6 +189,14 @@ public class ProfileFragment extends Fragment {
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void unused) {
+                                //update shared prefs
+                                SharedPreferences.Editor editor = sharedPreferences.edit();
+
+                                editor.putString(landemarkkey, landmarkPreference);
+                                editor.putString(unitskey, measurementSystem);
+                                editor.putString(languagekey,languagePreference);
+                                editor.commit();
+
                                 Log.d(TAG, "Settings successfully saved!");
                                 Toast.makeText(activity, "Settings Saved", Toast.LENGTH_SHORT).show();
                             }

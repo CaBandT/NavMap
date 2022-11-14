@@ -14,22 +14,15 @@
         android:orientation="vertical"
         android:layout_alignParentTop="true">
 
-        <ImageView
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:src="@drawable/ic_user_profile"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="20dp"/>
-
         <TextView
             android:id="@+id/displayName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Name"
+            android:text="@string/name"
             android:fontFamily="sans-serif-medium"
             android:textSize="25sp"
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="30dp"
             android:textColor="@color/black"/>
 
         <TextView
@@ -39,7 +32,7 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="5dp"
             android:fontFamily="sans-serif"
-            android:text="Email"
+            android:text="@string/email"
             android:textSize="18sp"/>
 
         <TextView
