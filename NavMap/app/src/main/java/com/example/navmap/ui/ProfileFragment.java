@@ -39,6 +39,7 @@ public class ProfileFragment extends Fragment {
     private Activity activity;
 
     Spinner landmarkSpinner;
+    Spinner languageSpinner;
     SwitchCompat imperialSwitch;
     TextView nameTV, emailTV;
     Button logout, save;
@@ -48,7 +49,7 @@ public class ProfileFragment extends Fragment {
     private FirebaseFirestore db;
     private AlertDialog.Builder alertBuilder;
 
-    String landmarkPreference, measurementSystem;
+    String landmarkPreference, measurementSystem, languagePreference;
 
     private static final String TAG = "ProfileFragment";
 
@@ -68,9 +69,11 @@ public class ProfileFragment extends Fragment {
 
         landmarkSpinner = activity.findViewById(R.id.landmarkSpinner);
         imperialSwitch = activity.findViewById(R.id.unitsToggle);
+        languageSpinner = activity.findViewById(R.id.languageSpinner);
 
         landmarkPreference = "";
         measurementSystem = "";
+        languagePreference = "";
 
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
@@ -99,6 +102,7 @@ public class ProfileFragment extends Fragment {
                                     Log.d("Profile", document.getId() + " => " + document.getData());
                                     landmarkPreference = document.get("landmarkPreference").toString();
                                     measurementSystem = document.get("measurementSystem").toString();
+                                    languagePreference = document.get("languagePreference").toString();
 
                                     showUserSettings();
                                 } else
@@ -133,11 +137,11 @@ public class ProfileFragment extends Fragment {
     private void updateUserSettings() {
         boolean updateFS = false;
 
-        if (imperialSwitch.isChecked() && measurementSystem.equals("Metric")){
-            measurementSystem = "Imperial";
+        if (imperialSwitch.isChecked() && measurementSystem.equals("metric")){
+            measurementSystem = "imperial";
             updateFS = true;
-        } else if ((!imperialSwitch.isChecked()) && measurementSystem.equals("Imperial")){
-            measurementSystem = "Metric";
+        } else if ((!imperialSwitch.isChecked()) && measurementSystem.equals("imperial")){
+            measurementSystem = "metric";
             updateFS = true;
         }
 
@@ -147,12 +151,19 @@ public class ProfileFragment extends Fragment {
             updateFS = true;
         }
 
+        String languageSelection = languageSpinner.getSelectedItem().toString();
+        if (!spinnerSelection.equals(languagePreference)){
+            languagePreference = languageSelection;
+            updateFS = true;
+        }
+
         //update fs if necessary
         if (updateFS){
             try {
                 Map<String, Object> userSettings = new HashMap<>();
                 userSettings.put("landmarkPreference", landmarkPreference);
                 userSettings.put("measurementSystem", measurementSystem);
+                userSettings.put("languagePreference",languagePreference);
 
                 db.collection("users")
                         .document(user.getUid())
@@ -181,7 +192,7 @@ public class ProfileFragment extends Fragment {
     }
 
     private void showUserSettings() {
-        if (measurementSystem.equals("Imperial")){
+        if (measurementSystem.equals("imperial")){
             imperialSwitch.setChecked(true);
         }
 
@@ -198,6 +209,17 @@ public class ProfileFragment extends Fragment {
             default:
                 landmarkSpinner.setSelection(0);
                 break;
+        }
+
+        switch (languagePreference)
+        {
+            case "Zulu":
+                languageSpinner.setSelection(1);
+                break;
+            default:
+                languageSpinner.setSelection(0);
+                break;
+
         }
     }
 

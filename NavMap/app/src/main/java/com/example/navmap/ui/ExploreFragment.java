@@ -8,8 +8,11 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconOffset;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -36,14 +39,18 @@ import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.navmap.R;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
+import com.mapbox.api.directions.v5.DirectionsCriteria;
 import com.mapbox.api.directions.v5.models.DirectionsResponse;
 import com.mapbox.api.directions.v5.models.DirectionsRoute;
 import com.mapbox.api.geocoding.v5.models.CarmenFeature;
@@ -121,6 +128,23 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
     private Animation rotateOpen, rotateClose, fromBottom, toBottom;
     //endregion
 
+    //shared preferences
+
+    public final int splashDelay = 700;
+    private ProgressDialog progressDialog;
+    public SharedPreferences sharedPreferences;
+
+    public static String userpref = "mypref";
+    public static final String unitskey = "unitkey";
+    public static final String landemarkkey = "landmarkpref";
+    public static final String languagekey = "languagepref";
+
+    private String landmarkPreference;
+    private String measurementSystem;
+    private String languagePreference;
+
+    //firebase stuff
+
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
     private String userUid;
@@ -142,16 +166,21 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
     @Override
     public void onStart() {
         super.onStart();
-
-        //start map
-        mapView = activity.findViewById(R.id.mapView);
-        mapView.onCreate(_savedInstanceState);
-        mapView.getMapAsync(this);
+        //shared Preferences
 
         //Firebase instantiations
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
         userUid = mAuth.getCurrentUser().getUid();
+
+        sharedPreferences = activity.getSharedPreferences(userpref, Context.MODE_PRIVATE);
+
+        getUserSettings();
+
+        //start map
+        mapView = activity.findViewById(R.id.mapView);
+        mapView.onCreate(_savedInstanceState);
+        mapView.getMapAsync(this);
 
         //region instantiations and set up required for layers
         //fab animations
@@ -252,6 +281,97 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
             }
         });
     }
+
+    //region load
+    private void loadFromDB()
+    {
+
+        ExecutorService service = Executors.newSingleThreadExecutor();
+        service.execute(new Runnable() {
+            @Override
+            public void run() {
+                //pre-execute
+                userpref = mAuth.getUid();
+                sharedPreferences = activity.getSharedPreferences(userpref, Context.MODE_PRIVATE);
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        progressDialog = ProgressDialog.show(activity,
+                                "Loading...", "Downloading bookmark data");
+                    }
+                });
+
+                //background
+                try {
+
+                    // do in background
+                } catch (Exception e) {
+                    Log.e(TAG, "Couldn't load bookmarks");
+                    e.printStackTrace();
+                }
+
+                //onPost-execute
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        progressDialog.dismiss();
+
+                        //do after
+                    }
+                });
+            }
+        });
+    }
+    //endregion
+
+    //region save user settings
+    public void SaveSharedPreferences()
+    {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        editor.putString(landemarkkey, landmarkPreference);
+        editor.putString(unitskey, measurementSystem);
+        editor.putString(languagekey,languagePreference);
+        editor.commit();
+        //Toast.makeText(activity, "Saved Successfully", Toast.LENGTH_SHORT).show();
+
+    }
+    //endregion
+
+    //region get users setting
+
+    private void getUserSettings()
+    {
+        try {
+            db.collection("users")
+                    .document(userUid)
+                    .get()
+                    .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                            if (task.isSuccessful()) {
+                                DocumentSnapshot document = task.getResult();
+                                if (document.exists()) {
+                                     Log.d(TAG, "Snapshot data" + document.getData());
+                                     landmarkPreference = document.get("landmarkPreference").toString();
+                                     measurementSystem = document.get("measurementSystem").toString();
+                                     languagePreference = document.get("languagePreference").toString();
+
+                                    SaveSharedPreferences();
+                                } else {
+                                    Log.w(TAG, "Mate thats an L");
+                                }
+                            }
+                        }
+                    });
+        }
+        catch(Exception ex)
+        {
+        Log.e(TAG, ex.getMessage());
+            ex.printStackTrace();
+        }
+    }
+
 
     private void saveBookmarkToFirebase(String name, String lat, String lng) {
         try {
@@ -548,6 +668,7 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
                 .accessToken(Mapbox.getAccessToken())
                 .origin(origin)
                 .destination(destination)
+                .voiceUnits(measurementSystem)
                 .build()
                 .getRoute(new Callback<DirectionsResponse>() {
                     @Override
