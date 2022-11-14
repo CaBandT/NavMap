@@ -120,7 +120,8 @@ public class RegisterActivity extends AppCompatActivity {
                         //Pushing user details into a hashmap
                         Map<String, Object> userSettings = new HashMap<>();
                         userSettings.put("landmarkPreference", "Any");
-                        userSettings.put("measurementSystem", "Metric");
+                        userSettings.put("languagePreference", "English");
+                        userSettings.put("measurementSystem", "metric");
 
                         //Add user info to Firestore DB - https://firebase.google.com/docs/firestore/manage-data/add-data
                         db.collection("users")

@@ -1,22 +1,30 @@
 package com.example.navmap;
 
+import static android.content.ContentValues.TAG;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class SplashActivity extends AppCompatActivity {
 
     //variables
     public final int splashDelay = 700;
     private static FirebaseAuth mAuth;
+    private ProgressDialog progressDialog;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,5 +65,41 @@ public class SplashActivity extends AppCompatActivity {
         };
         //Start Timer
         RunSplash.schedule(ShowSplash, splashDelay);
+    }
+
+    private void loadFromDB()
+    {
+        ExecutorService service = Executors.newSingleThreadExecutor();
+        service.execute(new Runnable() {
+            @Override
+            public void run() {
+                //pre-execute
+                SplashActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        progressDialog = ProgressDialog.show(SplashActivity.this,
+                                "Loading...", "Downloading bookmark data");
+                    }
+                });
+
+                //background
+                try {
+                    // do in background
+                } catch (Exception e) {
+                    Log.e(TAG, "Couldn't load bookmarks");
+                    e.printStackTrace();
+                }
+
+                //onPost-execute
+                SplashActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        progressDialog.dismiss();
+
+                        //do after
+                    }
+                });
+            }
+        });
     }
 }
