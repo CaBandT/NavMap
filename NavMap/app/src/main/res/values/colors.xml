@@ -13,4 +13,5 @@
     <color name="lime">#FF87EA5D</color>
     <color name="darkGreen">#FF35960c</color>
     <color name="grey">#9F9F9F</color>
+    <color name="semiTransparentGrey">#456C6C6C</color>
 </resources>
