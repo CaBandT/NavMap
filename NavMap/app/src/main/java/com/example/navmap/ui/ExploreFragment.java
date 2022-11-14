@@ -327,14 +327,13 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
     //region save user settings
     public void SaveSharedPreferences()
     {
-
-
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
         editor.putString(landemarkkey, landmarkPreference);
         editor.putString(unitskey, measurementSystem);
+        editor.putString(languagekey,languagePreference);
         editor.commit();
-        Toast.makeText(activity, "Saved Successfully", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(activity, "Saved Successfully", Toast.LENGTH_SHORT).show();
 
     }
     //endregion
@@ -353,10 +352,10 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
                             if (task.isSuccessful()) {
                                 DocumentSnapshot document = task.getResult();
                                 if (document.exists()) {
-                                    Log.d(TAG, "Snapshot data" + document.getData());
+                                     Log.d(TAG, "Snapshot data" + document.getData());
                                      landmarkPreference = document.get("landmarkPreference").toString();
                                      measurementSystem = document.get("measurementSystem").toString();
-                                    languagePreference = document.get("languagePreference").toString();
+                                     languagePreference = document.get("languagePreference").toString();
 
                                     SaveSharedPreferences();
                                 } else {
@@ -669,7 +668,7 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
                 .accessToken(Mapbox.getAccessToken())
                 .origin(origin)
                 .destination(destination)
-                .voiceUnits(DirectionsCriteria.METRIC)
+                .voiceUnits(measurementSystem)
                 .build()
                 .getRoute(new Callback<DirectionsResponse>() {
                     @Override
