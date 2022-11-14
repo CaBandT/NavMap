@@ -1,6 +1,7 @@
 package com.example.navmap;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,7 @@ import androidx.annotation.Nullable;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Locale;
@@ -51,7 +53,12 @@ public class BookmarkAdapter extends ArrayAdapter<Bookmark> {
         fabGoTo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(mContext, "This is #" + position, Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(mContext, BookmarkViewActivity.class);
+                intent.putExtra("bId",  getItem(position).getId());
+                intent.putExtra("bName",  getItem(position).getName());
+                intent.putExtra("bLat",  getItem(position).getLatitude());
+                intent.putExtra("bLng",  getItem(position).getLongitude());
+                mContext.startActivity(intent);
             }
         });
 
