@@ -13,7 +13,9 @@ import androidx.annotation.Nullable;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class BookmarkAdapter extends ArrayAdapter<Bookmark> {
     private Context mContext;
@@ -36,7 +38,12 @@ public class BookmarkAdapter extends ArrayAdapter<Bookmark> {
         TextView tvCoOrds = convertView.findViewById(R.id.lrbCoords);
 
         tvName.setText(getItem(position).getName());
-        String coOrds = getItem(position).getLatitude() + ", " + getItem(position).getLongitude();
+
+        Double lat = Double.parseDouble(getItem(position).getLatitude());
+        Double lng = Double.parseDouble(getItem(position).getLongitude());
+        DecimalFormat df = new DecimalFormat("#.00000");
+        String coOrds = df.format(lat) + ",   " + df.format(lng);
+
         tvCoOrds.setText(coOrds);
 
         FloatingActionButton fabGoTo = convertView.findViewById(R.id.lrbFabGoTo);

@@ -39,6 +39,7 @@ import com.example.navmap.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.mapbox.android.core.permissions.PermissionsListener;
@@ -227,16 +228,17 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
             @Override
             public void onClick(View view) {
                 AlertDialog.Builder dialog = new AlertDialog.Builder(activity);
-                dialog.setTitle("Name the bookmark");
 
-                final EditText etBookmarkName = new EditText(activity);
-                etBookmarkName.setInputType(InputType.TYPE_CLASS_TEXT);
-                dialog.setView(etBookmarkName);
+                final View customLayout = getLayoutInflater().inflate(R.layout.layout_custom_dialog, null);
+                dialog.setView(customLayout);
 
-                dialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                dialog.setTitle("Add Bookmark");
+
+                dialog.setPositiveButton("Save", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        String name = etBookmarkName.getText().toString();
+                        EditText nameInput = customLayout.findViewById(R.id.etNameInput);
+                        String name = nameInput.getText().toString();
                         String lat = "" + currentPoint.getLatitude();
                         String lng = "" + currentPoint.getLongitude();
 
@@ -531,7 +533,6 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
         }
 
         getRoute(originPoint, destinationPoint);
-        //getAddressAsync(point.getLongitude(), point.getLatitude());
 
         //enable nav btn
         btnStartNavigation.setEnabled(true);
@@ -540,25 +541,6 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
         fabBookmarkLocation.setEnabled(true);
         fabBookmarkLocation.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(activity, R.color.white)));
         return true;
-    }
-
-    private void getAddress(double lat, double lng) {
-        geocoder = new Geocoder(activity, Locale.getDefault());
-        if (lat != 0){
-            try {
-                addresses = geocoder.getFromLocation(lat/100000 , lng/100000 , 1);
-            } catch (IOException e) {
-                Log.e(TAG, "Unable to get location data");
-                e.printStackTrace();
-            }
-
-            if (addresses != null){
-                selectedAddress = addresses.get(0).getAddressLine(0);
-            } else
-            {
-                Toast.makeText(activity, "Address Null", Toast.LENGTH_SHORT).show();
-            }
-        }
     }
 
     private void getRoute(Point origin, Point destination) {
@@ -602,47 +584,6 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
                 });
     }
 
-    private void getAddressAsync(double lat, double lng)
-    {
-        ExecutorService service = Executors.newSingleThreadExecutor();
-        service.execute(new Runnable() {
-            @Override
-            public void run() {
-                //pre-execute
-                activity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-
-                    }
-                });
-
-                //background
-                try {
-                    getAddress(lat, lng);
-                } catch (Exception e) {
-                    Log.e(TAG, "Couldn't get address");
-                    e.printStackTrace();
-                }
-
-                //onPost-execute
-                activity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (!selectedAddress.isEmpty())
-                        {
-                            Toast.makeText(activity, "Address: " + selectedAddress, Toast.LENGTH_SHORT).show();
-                        } else
-                        {
-                            Toast.makeText(activity, "Address null", Toast.LENGTH_SHORT).show();
-                        }
-
-                        //Toast.makeText(activity, "Got Address", Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }
-        });
-    }
-
     @SuppressLint("MissingPermission")
     private void enableLocationComponent(Style loadedMapStyle) {
         if (PermissionsManager.areLocationPermissionsGranted(activity)) {
@@ -662,6 +603,7 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
         }
     }
 
+    //#region implementation methods
     @Override
     public void onExplanationNeeded(List<String> list) {
         Toast.makeText(activity,R.string.user_location_permission_explanation, Toast.LENGTH_SHORT).show();
@@ -718,7 +660,5 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
         super.onLowMemory();
         mapView.onLowMemory();
     }
-
-
-
+    //#endregion
 }

@@ -1,6 +1,7 @@
 package com.example.navmap.ui;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,13 +19,18 @@ import com.example.navmap.Bookmark;
 import com.example.navmap.BookmarkAdapter;
 import com.example.navmap.R;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class BookmarksFragment extends Fragment {
 
@@ -38,6 +44,7 @@ public class BookmarksFragment extends Fragment {
     private FirebaseFirestore db;
     private String userUid;
 
+    private ProgressDialog progressDialog;
     private final String TAG = "fragment_bookmarks";
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -59,7 +66,7 @@ public class BookmarksFragment extends Fragment {
         db = FirebaseFirestore.getInstance();
         userUid = mAuth.getCurrentUser().getUid();
 
-        populateBookmarks();
+        loadBookmarksFromDB();
     }
 
     private void populateBookmarks(){
@@ -102,6 +109,8 @@ public class BookmarksFragment extends Fragment {
                                     }
                                 }
                             }
+
+                            progressDialog.dismiss();
                         }
                     });
         } catch (Exception e)
@@ -109,5 +118,31 @@ public class BookmarksFragment extends Fragment {
             Log.e(TAG, e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    private void loadBookmarksFromDB()
+    {
+        ExecutorService service = Executors.newSingleThreadExecutor();
+        service.execute(new Runnable() {
+            @Override
+            public void run() {
+                //pre-execute
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        progressDialog = ProgressDialog.show(activity,
+                                "Loading...", "Downloading bookmark data");
+                    }
+                });
+
+                //background
+                try {
+                    populateBookmarks();
+                } catch (Exception e) {
+                    Log.e(TAG, "Couldn't load bookmarks");
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 }
