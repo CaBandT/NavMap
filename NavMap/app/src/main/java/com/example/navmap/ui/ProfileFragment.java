@@ -133,11 +133,11 @@ public class ProfileFragment extends Fragment {
     private void updateUserSettings() {
         boolean updateFS = false;
 
-        if (imperialSwitch.isChecked() && measurementSystem.equals("Metric")){
-            measurementSystem = "Imperial";
+        if (imperialSwitch.isChecked() && measurementSystem.equals("metric")){
+            measurementSystem = "imperial";
             updateFS = true;
-        } else if ((!imperialSwitch.isChecked()) && measurementSystem.equals("Imperial")){
-            measurementSystem = "Metric";
+        } else if ((!imperialSwitch.isChecked()) && measurementSystem.equals("imperial")){
+            measurementSystem = "metric";
             updateFS = true;
         }
 
@@ -181,7 +181,7 @@ public class ProfileFragment extends Fragment {
     }
 
     private void showUserSettings() {
-        if (measurementSystem.equals("Imperial")){
+        if (measurementSystem.equals("imperial")){
             imperialSwitch.setChecked(true);
         }
 
