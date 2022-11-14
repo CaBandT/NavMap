@@ -129,8 +129,6 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
     //endregion
 
     //shared preferences
-
-    public final int splashDelay = 700;
     private ProgressDialog progressDialog;
     public SharedPreferences sharedPreferences;
 
@@ -173,6 +171,7 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
         db = FirebaseFirestore.getInstance();
         userUid = mAuth.getCurrentUser().getUid();
 
+        userpref = mAuth.getUid();
         sharedPreferences = activity.getSharedPreferences(userpref, Context.MODE_PRIVATE);
 
         getUserSettings();
@@ -291,8 +290,6 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
             @Override
             public void run() {
                 //pre-execute
-                userpref = mAuth.getUid();
-                sharedPreferences = activity.getSharedPreferences(userpref, Context.MODE_PRIVATE);
                 activity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
