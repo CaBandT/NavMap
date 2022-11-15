@@ -37,5 +37,13 @@
         android:layout_marginTop="15dp"
         android:paddingBottom="57dp"/>
 
-
+    <ProgressBar
+        android:id="@+id/bookmarksProgressBar"
+        android:visibility="gone"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:indeterminateTint="@color/darkGreen"
+        android:layout_centerInParent="true"
+        android:layout_marginBottom="20dp"/>
 </RelativeLayout>

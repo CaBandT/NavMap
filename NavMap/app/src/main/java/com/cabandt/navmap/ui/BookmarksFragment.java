@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -32,6 +33,7 @@ public class BookmarksFragment extends Fragment {
     private Activity activity;
     ListView lvBookmarks;
     LinearLayout layoutNoBookmarks;
+    ProgressBar progressBar;
 
     ArrayList<Bookmark> bookmarkArray;
 
@@ -39,7 +41,6 @@ public class BookmarksFragment extends Fragment {
     private FirebaseFirestore db;
     private String userUid;
 
-    private ProgressDialog progressDialog;
     private final String TAG = "fragment_bookmarks";
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -55,6 +56,7 @@ public class BookmarksFragment extends Fragment {
 
         lvBookmarks = activity.findViewById(R.id.lvBookmarks);
         layoutNoBookmarks = activity.findViewById(R.id.layoutNoBookmarks);
+        progressBar = activity.findViewById(R.id.bookmarksProgressBar);
 
         //Firebase instantiations
         mAuth = FirebaseAuth.getInstance();
@@ -106,7 +108,7 @@ public class BookmarksFragment extends Fragment {
                                 }
                             }
 
-                            progressDialog.dismiss();
+                            progressBar.setVisibility(View.GONE);
                         }
                     });
         } catch (Exception e)
@@ -126,8 +128,7 @@ public class BookmarksFragment extends Fragment {
                 activity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        progressDialog = ProgressDialog.show(activity,
-                                "Loading...", "Downloading bookmark data");
+                        progressBar.setVisibility(View.VISIBLE);
                     }
                 });
 
