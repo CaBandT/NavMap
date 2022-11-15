@@ -95,7 +95,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
                             progressBar.setVisibility(View.GONE);
                             
                             if (task.isSuccessful()){
-                                simpleAlert("Email Sent", "Please check your email to reset your password.");
+                                simpleAlert("Email Sent", "Please check your email to reset your password. If you don't receive an email, check your spam folder.");
                                 etResetEmail.setText("");
                                 etResetEmail.clearFocus();
                             } else {

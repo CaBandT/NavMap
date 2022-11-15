@@ -22,6 +22,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -75,6 +76,8 @@ public class BookmarkViewActivity extends AppCompatActivity implements OnMapRead
     private String id, name;
     private double lat, lng;
     private TextView tvName, tvLat, tvLng;
+    private ProgressBar progressBar;
+    private AlertDialog.Builder alertBuilder;
 
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
@@ -114,6 +117,7 @@ public class BookmarkViewActivity extends AppCompatActivity implements OnMapRead
         tvLat = findViewById(R.id.tvBookmarkLat);
         tvLng = findViewById(R.id.tvBookmarkLng);
         fabDeleteBookmark = findViewById(R.id.fabDeleteBookmark);
+        progressBar = findViewById(R.id.bookmarkViewProgressBar);
 
         //Firebase instantiations
         mAuth = FirebaseAuth.getInstance();
@@ -154,6 +158,8 @@ public class BookmarkViewActivity extends AppCompatActivity implements OnMapRead
                 deleteDialog.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
+                        progressBar.setVisibility(View.VISIBLE);
+
                         db.collection("users")
                                 .document(userUid)
                                 .collection("bookmarks")
@@ -161,6 +167,7 @@ public class BookmarkViewActivity extends AppCompatActivity implements OnMapRead
                                 .delete().addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void unused) {
+                                        progressBar.setVisibility(View.GONE);
                                         Toast.makeText(BookmarkViewActivity.this, "Bookmark Deleted", Toast.LENGTH_SHORT).show();
 
                                         Intent intent = new Intent(BookmarkViewActivity.this, NavMain.class);
@@ -170,7 +177,8 @@ public class BookmarkViewActivity extends AppCompatActivity implements OnMapRead
                                 }).addOnFailureListener(new OnFailureListener() {
                                     @Override
                                     public void onFailure(@NonNull Exception e) {
-                                        Toast.makeText(BookmarkViewActivity.this, "Unable to delete bookmark", Toast.LENGTH_SHORT).show();
+                                        progressBar.setVisibility(View.GONE);
+                                        simpleAlert("Delete Error", "Unable to delete bookmark, please try again later...");
                                     }
                                 });
                     }
@@ -285,6 +293,16 @@ public class BookmarkViewActivity extends AppCompatActivity implements OnMapRead
                         Log.e(TAG, "Error: " + t.getMessage());
                     }
                 });
+    }
+
+    public void simpleAlert(String title, String message)
+    {
+        alertBuilder.setTitle(title).
+                setMessage(message).
+                setCancelable(false).
+                setPositiveButton("Ok", null);
+
+        alertBuilder.show();
     }
 
     @SuppressLint("MissingPermission")

@@ -46,6 +46,4 @@
         android:indeterminateTint="@color/darkGreen"
         android:layout_centerInParent="true"
         android:layout_marginBottom="20dp"/>
-
-
 </RelativeLayout>
