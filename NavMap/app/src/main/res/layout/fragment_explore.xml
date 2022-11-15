@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".ui.ExploreFragment"
+    tools:context="com.cabandt.navmap.ui.ExploreFragment"
     android:paddingBottom="57dp">
 
     <com.mapbox.mapboxsdk.maps.MapView

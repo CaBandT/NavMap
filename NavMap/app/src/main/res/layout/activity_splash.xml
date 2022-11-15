@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/darkGrey"
-    tools:context=".SplashActivity">
+    tools:context="com.cabandt.navmap.SplashActivity">
 
     <ImageView
         android:layout_width="200dp"
