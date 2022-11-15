@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -17,12 +18,14 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.SwitchCompat;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.fragment.app.Fragment;
 
 import com.cabandt.navmap.LoginActivity;
 import com.cabandt.navmap.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -39,6 +42,9 @@ public class ProfileFragment extends Fragment {
     SwitchCompat imperialSwitch;
     TextView nameTV, emailTV;
     Button logout, save;
+    ProgressBar progressBar;
+
+    private CoordinatorLayout coordinatorLayout;
 
     private FirebaseAuth auth;
     private FirebaseUser user;
@@ -73,6 +79,8 @@ public class ProfileFragment extends Fragment {
         landmarkSpinner = activity.findViewById(R.id.landmarkSpinner);
         imperialSwitch = activity.findViewById(R.id.unitsToggle);
         languageSpinner = activity.findViewById(R.id.languageSpinner);
+        progressBar = activity.findViewById(R.id.profileProgressBar);
+        coordinatorLayout = activity.findViewById(R.id.coordinator);
 
         landmarkPreference = "";
         measurementSystem = "";
@@ -131,6 +139,7 @@ public class ProfileFragment extends Fragment {
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                progressBar.setVisibility(View.VISIBLE);
                 updateUserSettings();
             }
         });
@@ -191,13 +200,17 @@ public class ProfileFragment extends Fragment {
                                 editor.putString(languagekey,languagePreference);
                                 editor.commit();
 
+                                progressBar.setVisibility(View.GONE);
+
                                 Log.d(TAG, "Settings successfully saved!");
-                                Toast.makeText(activity, "Settings Saved", Toast.LENGTH_SHORT).show();
+                                //Toast.makeText(activity, "Settings Saved", Toast.LENGTH_SHORT).show();
+                                Snackbar.make(coordinatorLayout, "Settings saved successfully", Snackbar.LENGTH_SHORT).show();
                             }
                         })
                         .addOnFailureListener(new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception e) {
+                                progressBar.setVisibility(View.GONE);
                                 Log.e(TAG, "Error saving settings!");
                                 simpleAlert("Error Saving!",
                                         "Your settings weren't saved. Please try again later.");

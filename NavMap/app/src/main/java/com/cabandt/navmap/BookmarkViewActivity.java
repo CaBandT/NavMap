@@ -101,6 +101,10 @@ public class BookmarkViewActivity extends AppCompatActivity implements OnMapRead
         Mapbox.getInstance(this,getString(R.string.mapbox_access_token));
         setContentView(R.layout.activity_bookmark_view);
 
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().hide();
+        }
+
         id = getIntent().getStringExtra("bId");
         name =  getIntent().getStringExtra("bName");
         lat =  Double.parseDouble(getIntent().getStringExtra("bLat"));

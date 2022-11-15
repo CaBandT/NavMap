@@ -57,6 +57,7 @@
     <string name="longitude">Longitude:</string>
     <string name="latitude">Latitude:</string>
     <string name="bookmark_title">Bookmark Title</string>
+    <string name="reset_password">Reset password</string>
 
     <string-array name="landmarksTypes">
         <item>Any</item>
