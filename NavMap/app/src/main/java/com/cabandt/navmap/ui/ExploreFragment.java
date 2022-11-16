@@ -111,7 +111,7 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
     private TextView tvRouteDist, tvRouteTime;
     private CoordinatorLayout coordinatorLayout;
 
-    private LatLng currentPoint;
+    private Point currentPoint;
     private Geocoder geocoder;
     private List<Address> addresses;
     private String selectedAddress = "";
@@ -279,8 +279,8 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
                     public void onClick(DialogInterface dialogInterface, int i) {
                         EditText nameInput = customLayout.findViewById(R.id.etNameInput);
                         String name = nameInput.getText().toString();
-                        String lat = "" + currentPoint.getLatitude();
-                        String lng = "" + currentPoint.getLongitude();
+                        String lat = "" + currentPoint.latitude();
+                        String lng = "" + currentPoint.longitude();
 
                         saveBookmarkToFirebase(name, lat, lng);
                     }
@@ -513,8 +513,8 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
             enableLocationComponent(style);
             addDestinationIconSymbolLayer(style);
             mapboxMap.addOnMapClickListener(this);
-            navigationMapRoute = new NavigationMapRoute(null, mapView, mapboxMap,
-                        com.mapbox.services.android.navigation.ui.v5.R.style.NavigationMapRoute);
+            //navigationMapRoute = new NavigationMapRoute(null, mapView, mapboxMap,
+                        //com.mapbox.services.android.navigation.ui.v5.R.style.NavigationMapRoute);
 
             btnStartNavigation = activity.findViewById(R.id.btnStart);
             btnStartNavigation.setOnClickListener(v -> {
@@ -582,7 +582,7 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
             if (mapboxMap != null){
                 Style style = mapboxMap.getStyle();
                 if (style != null){
-                    GeoJsonSource source = style.getSourceAs(geoJsonSourceLayerId);
+                    GeoJsonSource source = style.getSourceAs("destination-source-id");
                     if (source != null){
                         source.setGeoJson(FeatureCollection.fromFeatures(
                                 new Feature[]{Feature.fromJson(selectedCarmenFeature.toJson())}));
@@ -595,14 +595,25 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
                                     ((Point) selectedCarmenFeature.geometry()).longitude()))
                             .zoom(14)
                             .build()), 4000);
+
+                    Point destinationPoint = (Point) selectedCarmenFeature.geometry();
+                    Point originPoint = Point.fromLngLat(locationComponent.getLastKnownLocation().getLongitude(),
+                            locationComponent.getLastKnownLocation().getLatitude());
+
+                    currentPoint = destinationPoint;
+
+                    getRoute(originPoint, destinationPoint);
                 }
             }
         }
     }
 
     private void addDestinationIconSymbolLayer(Style loadedMapStyle) {
-        loadedMapStyle.addImage("destination-icon-id", BitmapFactory.decodeResource(
-                this.getResources(), com.mapbox.mapboxsdk.R.drawable.mapbox_marker_icon_default));
+        Drawable drawable = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_baseline_location_on_24, null);
+        Bitmap bitmap = BitmapUtils.getBitmapFromDrawable(drawable);
+
+        loadedMapStyle.addImage("destination-icon-id", bitmap); //BitmapFactory.decodeResource(
+                //this.getResources(), com.mapbox.mapboxsdk.R.drawable.mapbox_marker_icon_default));
         GeoJsonSource geoJsonSource = new GeoJsonSource("destination-source-id");
         loadedMapStyle.addSource(geoJsonSource);
 
@@ -619,7 +630,7 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
         Point originPoint = Point.fromLngLat(locationComponent.getLastKnownLocation().getLongitude(),
                 locationComponent.getLastKnownLocation().getLatitude());
 
-        currentPoint = point;
+        currentPoint = destinationPoint;
 
         GeoJsonSource source = mapboxMap.getStyle().getSourceAs("destination-source-id");
         if (source != null){
@@ -628,12 +639,6 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
 
         getRoute(originPoint, destinationPoint);
 
-        //enable nav btn
-        btnStartNavigation.setEnabled(true);
-        btnStartNavigation.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(activity, R.color.darkGreen)));
-        //enable
-        fabBookmarkLocation.setEnabled(true);
-        fabBookmarkLocation.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(activity, R.color.white)));
         return true;
     }
 
@@ -665,9 +670,19 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
                         // Draw the route on the map
                         if (navigationMapRoute != null){
                             navigationMapRoute.removeRoute();
+                        } else {
+                            navigationMapRoute = new NavigationMapRoute(null, mapView, mapboxMap,
+                                    com.mapbox.services.android.navigation.ui.v5.R.style.NavigationMapRoute);
                         }
 
                         navigationMapRoute.addRoute(currentRoute);
+
+                        //enable nav btn
+                        btnStartNavigation.setEnabled(true);
+                        btnStartNavigation.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(activity, R.color.darkGreen)));
+                        //enable
+                        fabBookmarkLocation.setEnabled(true);
+                        fabBookmarkLocation.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(activity, R.color.white)));
                     }
 
                     @Override
