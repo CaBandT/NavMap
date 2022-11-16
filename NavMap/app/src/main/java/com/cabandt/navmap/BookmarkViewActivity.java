@@ -75,7 +75,7 @@ public class BookmarkViewActivity extends AppCompatActivity implements OnMapRead
 
     private String id, name;
     private double lat, lng;
-    private TextView tvName, tvLat, tvLng;
+    private TextView tvName, tvLat, tvLng, tvDistance, tvDuration;
     private ProgressBar progressBar;
     private AlertDialog.Builder alertBuilder;
 
@@ -116,6 +116,8 @@ public class BookmarkViewActivity extends AppCompatActivity implements OnMapRead
         tvName = findViewById(R.id.tvBookmarkTitle);
         tvLat = findViewById(R.id.tvBookmarkLat);
         tvLng = findViewById(R.id.tvBookmarkLng);
+        tvDuration = findViewById(R.id.tvBookmarkDuration);
+        tvDistance = findViewById(R.id.tvBookmarkDistance);
         fabDeleteBookmark = findViewById(R.id.fabDeleteBookmark);
         progressBar = findViewById(R.id.bookmarkViewProgressBar);
 
@@ -275,6 +277,8 @@ public class BookmarkViewActivity extends AppCompatActivity implements OnMapRead
 
                         currentRoute = response.body().routes().get(0);
 
+                        setDistanceAndTime();
+
                         // Draw the route on the map
                         if (navigationMapRoute != null){
                             navigationMapRoute.removeRoute();
@@ -293,6 +297,31 @@ public class BookmarkViewActivity extends AppCompatActivity implements OnMapRead
                         Log.e(TAG, "Error: " + t.getMessage());
                     }
                 });
+    }
+
+    public void setDistanceAndTime(){
+        if (measurementSystem.equals("metric"))
+        {
+            Double dist = currentRoute.distance()/10;
+            dist = Double.valueOf(Math.round(dist));
+            dist /= 100;
+            tvDistance.setText(dist + " km");
+        } else {
+            Double dist = currentRoute.distance()/1609.33;
+            dist *= 100;
+            dist = Double.valueOf(Math.round(dist));
+            dist /= 100;
+            tvDistance.setText(dist + " miles");
+        }
+
+        Double time = currentRoute.duration()/60;
+        if (time % 10 >= 5){
+            time ++;
+        }
+        time = Double.valueOf(Math.round(time));
+
+        String duration = time.intValue() + " mins";
+        tvDuration.setText(duration);
     }
 
     public void simpleAlert(String title, String message)
