@@ -8,6 +8,7 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconOffset;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.content.res.ResourcesCompat;
 
 import android.annotation.SuppressLint;
@@ -24,12 +25,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.cabandt.navmap.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.mapbox.android.core.permissions.PermissionsListener;
@@ -69,13 +70,14 @@ public class BookmarkViewActivity extends AppCompatActivity implements OnMapRead
     private NavigationMapRoute navigationMapRoute;
     private String geoJsonSourceLayerId = "GeoJsonSourceLayerId";
     private String symbolIconId="SymbolIconId";
+    private CoordinatorLayout coordinatorLayout;
 
     private Button btnStartNavigation;
     private FloatingActionButton fabDeleteBookmark;
 
     private String id, name;
     private double lat, lng;
-    private TextView tvName, tvLat, tvLng;
+    private TextView tvName, tvLat, tvLng, tvDistance, tvDuration;
     private ProgressBar progressBar;
     private AlertDialog.Builder alertBuilder;
 
@@ -116,8 +118,11 @@ public class BookmarkViewActivity extends AppCompatActivity implements OnMapRead
         tvName = findViewById(R.id.tvBookmarkTitle);
         tvLat = findViewById(R.id.tvBookmarkLat);
         tvLng = findViewById(R.id.tvBookmarkLng);
+        tvDuration = findViewById(R.id.tvBookmarkDuration);
+        tvDistance = findViewById(R.id.tvBookmarkDistance);
         fabDeleteBookmark = findViewById(R.id.fabDeleteBookmark);
         progressBar = findViewById(R.id.bookmarkViewProgressBar);
+        coordinatorLayout = findViewById(R.id.bookmarkViewCoordinator);
 
         //Firebase instantiations
         mAuth = FirebaseAuth.getInstance();
@@ -168,7 +173,7 @@ public class BookmarkViewActivity extends AppCompatActivity implements OnMapRead
                                     @Override
                                     public void onSuccess(Void unused) {
                                         progressBar.setVisibility(View.GONE);
-                                        Toast.makeText(BookmarkViewActivity.this, "Bookmark Deleted", Toast.LENGTH_SHORT).show();
+                                        Snackbar.make(coordinatorLayout, "Bookmark deleted...", Snackbar.LENGTH_SHORT);
 
                                         Intent intent = new Intent(BookmarkViewActivity.this, NavMain.class);
                                         startActivity(intent);
@@ -253,7 +258,6 @@ public class BookmarkViewActivity extends AppCompatActivity implements OnMapRead
             source.setGeoJson(Feature.fromGeometry(destinationPoint));
         }
 
-
         NavigationRoute.builder(this)
                 .accessToken(Mapbox.getAccessToken())
                 .origin(originPoint)
@@ -269,11 +273,14 @@ public class BookmarkViewActivity extends AppCompatActivity implements OnMapRead
                             Log.d(TAG, "No routes found, make sure you set the right user and access token.");
                             return;
                         } else if (response.body().routes().size() < 1){
+                            Snackbar.make(coordinatorLayout, "No routes found...", Snackbar.LENGTH_INDEFINITE);
                             Log.e(TAG, "No routes found");
                             return;
                         }
 
                         currentRoute = response.body().routes().get(0);
+
+                        setDistanceAndTime();
 
                         // Draw the route on the map
                         if (navigationMapRoute != null){
@@ -293,6 +300,52 @@ public class BookmarkViewActivity extends AppCompatActivity implements OnMapRead
                         Log.e(TAG, "Error: " + t.getMessage());
                     }
                 });
+    }
+
+    public void setDistanceAndTime(){
+        Double distInMeters = currentRoute.distance();
+        Double dist;
+        if (measurementSystem.equals("metric"))
+        {
+            if (distInMeters > 10000){
+                dist = distInMeters/1000;
+                dist = Double.valueOf(Math.round(dist));
+                tvDistance.setText(dist.intValue() + " km");
+            } else {
+                dist = distInMeters/10;
+                dist = Double.valueOf(Math.round(dist));
+                dist /= 100;
+                tvDistance.setText(dist + " km");
+            }
+        } else {
+            dist = distInMeters/1609.33;
+            if (distInMeters > 16090){
+                dist = Double.valueOf(Math.round(dist));
+                tvDistance.setText(dist.intValue() + " miles");
+            } else {
+                dist *= 100;
+                dist = Double.valueOf(Math.round(dist));
+                dist /= 100;
+                tvDistance.setText(dist + " miles");
+            }
+        }
+
+        Double time = currentRoute.duration()/60;
+        if (time % 10 >= 5){
+            time ++;
+        }
+        time = Double.valueOf(Math.round(time));
+
+        String duration;
+        if (time > 60){
+            int hours = (int)(time/60);
+            int mins = time.intValue() - (hours * 60);
+
+            duration = hours + "h " + mins + " m";
+        } else {
+            duration = time.intValue() + " mins";
+        }
+        tvDuration.setText(duration);
     }
 
     public void simpleAlert(String title, String message)
@@ -328,7 +381,7 @@ public class BookmarkViewActivity extends AppCompatActivity implements OnMapRead
 
     @Override
     public void onExplanationNeeded(List<String> permissionsToExplain) {
-        Toast.makeText(this, R.string.user_location_permission_explanation, Toast.LENGTH_SHORT).show();
+        Snackbar.make(coordinatorLayout, R.string.user_location_permission_explanation, Snackbar.LENGTH_INDEFINITE);
     }
 
     @Override
@@ -336,8 +389,8 @@ public class BookmarkViewActivity extends AppCompatActivity implements OnMapRead
         if (granted){
             enableLocationComponent(mapboxMap.getStyle());
         } else {
-            Toast.makeText(this, R.string.user_location_permission_not_granted, Toast.LENGTH_SHORT).show();
-            finish();
+            Snackbar.make(coordinatorLayout, R.string.user_location_permission_not_granted, Snackbar.LENGTH_INDEFINITE);
+            //finish();
         }
     }
 

@@ -58,6 +58,10 @@
     <string name="latitude">Latitude:</string>
     <string name="bookmark_title">Bookmark Title</string>
     <string name="reset_password">Reset password</string>
+    <string name="distance">Distance:</string>
+    <string name="duration">Duration:</string>
+    <string name="dist">Dist:</string>
+    <string name="time">Time:</string>
 
     <string-array name="landmarksTypes">
         <item>Any</item>

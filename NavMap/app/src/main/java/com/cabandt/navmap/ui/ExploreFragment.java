@@ -21,7 +21,6 @@ import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
-import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,10 +29,13 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.cardview.widget.CardView;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
@@ -89,6 +91,7 @@ import java.util.concurrent.Executors;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import timber.log.Timber;
 
 
 public class ExploreFragment extends Fragment implements OnMapReadyCallback, PermissionsListener, MapboxMap.OnMapClickListener {
@@ -104,8 +107,11 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
     private NavigationMapRoute navigationMapRoute;
     private Button btnStartNavigation;
     private FloatingActionButton fabLocationSearch, fabTrackUser, fabBookmarkLocation;
+    private CardView cardRouteDetails;
+    private TextView tvRouteDist, tvRouteTime;
+    private CoordinatorLayout coordinatorLayout;
 
-    private LatLng currentPoint;
+    private Point currentPoint;
     private Geocoder geocoder;
     private List<Address> addresses;
     private String selectedAddress = "";
@@ -174,6 +180,8 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
         userpref = mAuth.getUid();
         sharedPreferences = activity.getSharedPreferences(userpref, Context.MODE_PRIVATE);
 
+        coordinatorLayout = activity.findViewById(R.id.exploreCoordinator);
+
         getUserSettings();
 
         //start map
@@ -201,6 +209,10 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
         fabTraffic.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(activity, R.color.grey)));
         fabBookmarkLocation.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(activity, R.color.semiTransparentGrey)));
         //endregion
+
+        cardRouteDetails = activity.findViewById(R.id.cardRouteDetails);
+        tvRouteTime = activity.findViewById(R.id.tvDuration);
+        tvRouteDist = activity.findViewById(R.id.tvDistance);
 
         //region layer Fab onClickListeners
         fabMenu.setOnClickListener(new View.OnClickListener() {
@@ -246,7 +258,7 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
                     //set the components camera
                     locationComponent.setCameraMode(CameraMode.TRACKING_GPS_NORTH);
                 } else {
-                    Toast.makeText(activity, "Unable to Track location", Toast.LENGTH_SHORT).show();
+                    Snackbar.make(coordinatorLayout, "Unable to track location...", Snackbar.LENGTH_INDEFINITE).show();
                 }
             }
         });
@@ -267,8 +279,8 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
                     public void onClick(DialogInterface dialogInterface, int i) {
                         EditText nameInput = customLayout.findViewById(R.id.etNameInput);
                         String name = nameInput.getText().toString();
-                        String lat = "" + currentPoint.getLatitude();
-                        String lng = "" + currentPoint.getLongitude();
+                        String lat = "" + currentPoint.latitude();
+                        String lng = "" + currentPoint.longitude();
 
                         saveBookmarkToFirebase(name, lat, lng);
                     }
@@ -281,46 +293,6 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
         });
     }
 
-    //region load
-    private void loadFromDB()
-    {
-
-        ExecutorService service = Executors.newSingleThreadExecutor();
-        service.execute(new Runnable() {
-            @Override
-            public void run() {
-                //pre-execute
-                activity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        progressDialog = ProgressDialog.show(activity,
-                                "Loading...", "Downloading bookmark data");
-                    }
-                });
-
-                //background
-                try {
-
-                    // do in background
-                } catch (Exception e) {
-                    Log.e(TAG, "Couldn't load bookmarks");
-                    e.printStackTrace();
-                }
-
-                //onPost-execute
-                activity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        progressDialog.dismiss();
-
-                        //do after
-                    }
-                });
-            }
-        });
-    }
-    //endregion
-
     //region save user settings
     public void SaveSharedPreferences()
     {
@@ -330,8 +302,6 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
         editor.putString(unitskey, measurementSystem);
         editor.putString(languagekey,languagePreference);
         editor.commit();
-        //Toast.makeText(activity, "Saved Successfully", Toast.LENGTH_SHORT).show();
-
     }
     //endregion
 
@@ -384,14 +354,14 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
                     .set(bookmark).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void unused) {
-                            Toast.makeText(activity, "Bookmark saved!", Toast.LENGTH_SHORT).show();
+                            Snackbar.make(coordinatorLayout, "Bookmark saved!", Snackbar.LENGTH_SHORT).show();
                             Log.d(TAG, "Bookmark saved to Firebase");
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                            Toast.makeText(activity, "Unable to save Bookmark", Toast.LENGTH_SHORT).show();
+                            Snackbar.make(coordinatorLayout, "Error - unable to save bookmark...", Snackbar.LENGTH_LONG).show();
                             Log.w(TAG, "Failed to save Bookmark to Firebase: " + e.getMessage());
                             e.printStackTrace();
                         }
@@ -399,7 +369,7 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
 
 
         } catch (Exception e) {
-            Toast.makeText(activity, "Unable to save Bookmark", Toast.LENGTH_SHORT).show();
+            Snackbar.make(coordinatorLayout, "Error - unable to save bookmark...", Snackbar.LENGTH_LONG).show();
             Log.w(TAG, "Unable to save bookmark!");
             e.printStackTrace();
         }
@@ -543,6 +513,8 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
             enableLocationComponent(style);
             addDestinationIconSymbolLayer(style);
             mapboxMap.addOnMapClickListener(this);
+            //navigationMapRoute = new NavigationMapRoute(null, mapView, mapboxMap,
+                        //com.mapbox.services.android.navigation.ui.v5.R.style.NavigationMapRoute);
 
             btnStartNavigation = activity.findViewById(R.id.btnStart);
             btnStartNavigation.setOnClickListener(v -> {
@@ -581,9 +553,14 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
     private void initSearchFab() {
         fabLocationSearch = activity.findViewById(R.id.fab_location_search);
         fabLocationSearch.setOnClickListener(view -> {
+            Point currentLocation = Point.fromLngLat(
+                    locationComponent.getLastKnownLocation().getLongitude(),
+                    locationComponent.getLastKnownLocation().getLatitude());
+
             Intent intent = new PlaceAutocomplete.IntentBuilder()
                     .accessToken(Mapbox.getAccessToken() != null ? Mapbox.getAccessToken() : getString(R.string.mapbox_access_token))
                     .placeOptions(PlaceOptions.builder()
+                            .proximity(currentLocation)
                             .backgroundColor(Color.parseColor("#EEEEEE"))
                             .limit(10)
                             .build(PlaceOptions.MODE_CARDS))
@@ -605,7 +582,7 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
             if (mapboxMap != null){
                 Style style = mapboxMap.getStyle();
                 if (style != null){
-                    GeoJsonSource source = style.getSourceAs(geoJsonSourceLayerId);
+                    GeoJsonSource source = style.getSourceAs("destination-source-id");
                     if (source != null){
                         source.setGeoJson(FeatureCollection.fromFeatures(
                                 new Feature[]{Feature.fromJson(selectedCarmenFeature.toJson())}));
@@ -618,14 +595,25 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
                                     ((Point) selectedCarmenFeature.geometry()).longitude()))
                             .zoom(14)
                             .build()), 4000);
+
+                    Point destinationPoint = (Point) selectedCarmenFeature.geometry();
+                    Point originPoint = Point.fromLngLat(locationComponent.getLastKnownLocation().getLongitude(),
+                            locationComponent.getLastKnownLocation().getLatitude());
+
+                    currentPoint = destinationPoint;
+
+                    getRoute(originPoint, destinationPoint);
                 }
             }
         }
     }
 
     private void addDestinationIconSymbolLayer(Style loadedMapStyle) {
-        loadedMapStyle.addImage("destination-icon-id", BitmapFactory.decodeResource(
-                this.getResources(), com.mapbox.mapboxsdk.R.drawable.mapbox_marker_icon_default));
+        Drawable drawable = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_baseline_location_on_24, null);
+        Bitmap bitmap = BitmapUtils.getBitmapFromDrawable(drawable);
+
+        loadedMapStyle.addImage("destination-icon-id", bitmap); //BitmapFactory.decodeResource(
+                //this.getResources(), com.mapbox.mapboxsdk.R.drawable.mapbox_marker_icon_default));
         GeoJsonSource geoJsonSource = new GeoJsonSource("destination-source-id");
         loadedMapStyle.addSource(geoJsonSource);
 
@@ -642,7 +630,7 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
         Point originPoint = Point.fromLngLat(locationComponent.getLastKnownLocation().getLongitude(),
                 locationComponent.getLastKnownLocation().getLatitude());
 
-        currentPoint = point;
+        currentPoint = destinationPoint;
 
         GeoJsonSource source = mapboxMap.getStyle().getSourceAs("destination-source-id");
         if (source != null){
@@ -651,12 +639,6 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
 
         getRoute(originPoint, destinationPoint);
 
-        //enable nav btn
-        btnStartNavigation.setEnabled(true);
-        btnStartNavigation.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(activity, R.color.darkGreen)));
-        //enable
-        fabBookmarkLocation.setEnabled(true);
-        fabBookmarkLocation.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(activity, R.color.white)));
         return true;
     }
 
@@ -676,23 +658,31 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
                             Log.d(TAG, "No routes found, make sure you set the right user and access token.");
                             return;
                         } else if (response.body().routes().size() < 1){
+                            Snackbar.make(coordinatorLayout, "Error - No routes found...", Snackbar.LENGTH_LONG).show();
                             Log.e(TAG, "No routes found");
                             return;
                         }
 
                         currentRoute = response.body().routes().get(0);
 
+                        setDistanceAndTime();
+
                         // Draw the route on the map
                         if (navigationMapRoute != null){
                             navigationMapRoute.removeRoute();
-                        }
-                        else
-                        {
-                            navigationMapRoute = new NavigationMapRoute(
-                                    null, mapView, mapboxMap,
+                        } else {
+                            navigationMapRoute = new NavigationMapRoute(null, mapView, mapboxMap,
                                     com.mapbox.services.android.navigation.ui.v5.R.style.NavigationMapRoute);
                         }
+
                         navigationMapRoute.addRoute(currentRoute);
+
+                        //enable nav btn
+                        btnStartNavigation.setEnabled(true);
+                        btnStartNavigation.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(activity, R.color.darkGreen)));
+                        //enable
+                        fabBookmarkLocation.setEnabled(true);
+                        fabBookmarkLocation.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(activity, R.color.white)));
                     }
 
                     @Override
@@ -700,6 +690,54 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
                         Log.e(TAG, "Error: " + t.getMessage());
                     }
                 });
+    }
+
+    public void setDistanceAndTime(){
+        Double distInMeters = currentRoute.distance();
+        Double dist;
+        if (measurementSystem.equals("metric"))
+        {
+            if (distInMeters > 10000){
+                dist = distInMeters/1000;
+                dist = Double.valueOf(Math.round(dist));
+                tvRouteDist.setText(dist.intValue() + " km");
+            } else {
+                dist = distInMeters/10;
+                dist = Double.valueOf(Math.round(dist));
+                dist /= 100;
+                tvRouteDist.setText(dist + " km");
+            }
+        } else {
+            dist = distInMeters/1609.33;
+            if (distInMeters > 16090){
+                dist = Double.valueOf(Math.round(dist));
+                tvRouteDist.setText(dist.intValue() + " miles");
+            } else {
+                dist *= 100;
+                dist = Double.valueOf(Math.round(dist));
+                dist /= 100;
+                tvRouteDist.setText(dist + " miles");
+            }
+        }
+
+        Double time = currentRoute.duration()/60;
+        if (time % 10 >= 5){
+            time ++;
+        }
+        time = Double.valueOf(Math.round(time));
+
+        String duration;
+        if (time > 60){
+            int hours = (int)(time/60);
+            int mins = time.intValue() - (hours * 60);
+
+            duration = hours + "h " + mins + " m";
+        } else {
+            duration = time.intValue() + " mins";
+        }
+        tvRouteTime.setText(duration);
+
+        cardRouteDetails.setVisibility(View.VISIBLE);
     }
 
     @SuppressLint("MissingPermission")
@@ -724,7 +762,7 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
     //#region implementation methods
     @Override
     public void onExplanationNeeded(List<String> list) {
-        Toast.makeText(activity,R.string.user_location_permission_explanation, Toast.LENGTH_SHORT).show();
+        Snackbar.make(coordinatorLayout, R.string.user_location_permission_explanation, Snackbar.LENGTH_INDEFINITE).show();
     }
 
     @Override
@@ -732,7 +770,7 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
         if (granted){
             enableLocationComponent(mapboxMap.getStyle());
         } else {
-            Toast.makeText(activity, R.string.user_location_permission_not_granted, Toast.LENGTH_SHORT).show();
+            Snackbar.make(coordinatorLayout, R.string.user_location_permission_not_granted, Snackbar.LENGTH_INDEFINITE).show();
             //finish();
         }
     }

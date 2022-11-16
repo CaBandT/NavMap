@@ -80,7 +80,7 @@ public class ProfileFragment extends Fragment {
         imperialSwitch = activity.findViewById(R.id.unitsToggle);
         languageSpinner = activity.findViewById(R.id.languageSpinner);
         progressBar = activity.findViewById(R.id.profileProgressBar);
-        coordinatorLayout = activity.findViewById(R.id.coordinator);
+        coordinatorLayout = activity.findViewById(R.id.profileCoordinator);
 
         landmarkPreference = "";
         measurementSystem = "";
@@ -109,31 +109,6 @@ public class ProfileFragment extends Fragment {
             languagePreference = sharedPreferences.getString(languagekey,"");
 
             showUserSettings();
-
-            /*db.collection("users")
-                    .document(user.getUid())
-                    .get()
-                    .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                            if(task.isSuccessful()){
-                                DocumentSnapshot document = task.getResult();
-                                if (document.exists()){
-                                    Log.d("Profile", document.getId() + " => " + document.getData());
-                                    landmarkPreference = document.get("landmarkPreference").toString();
-                                    measurementSystem = document.get("measurementSystem").toString();
-                                    languagePreference = document.get("languagePreference").toString();
-
-                                    showUserSettings();
-                                } else
-                                {
-                                    simpleAlert("Connection Error",
-                                            "Unable to retrieve your settings. Please try again later.");
-                                    Log.w("Profile", "Unable to retrieve data!");
-                                }
-                            }
-                        }
-                    });*/
         }
 
         save.setOnClickListener(new View.OnClickListener() {
