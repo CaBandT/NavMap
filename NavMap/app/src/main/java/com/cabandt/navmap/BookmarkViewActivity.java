@@ -255,7 +255,6 @@ public class BookmarkViewActivity extends AppCompatActivity implements OnMapRead
             source.setGeoJson(Feature.fromGeometry(destinationPoint));
         }
 
-
         NavigationRoute.builder(this)
                 .accessToken(Mapbox.getAccessToken())
                 .origin(originPoint)
@@ -271,6 +270,7 @@ public class BookmarkViewActivity extends AppCompatActivity implements OnMapRead
                             Log.d(TAG, "No routes found, make sure you set the right user and access token.");
                             return;
                         } else if (response.body().routes().size() < 1){
+                            Toast.makeText(BookmarkViewActivity.this, "No Routes Found", Toast.LENGTH_SHORT).show();
                             Log.e(TAG, "No routes found");
                             return;
                         }

@@ -7,7 +7,7 @@
     android:background="@color/lightGrey"
     tools:context="com.cabandt.navmap.ui.BookmarksFragment"
     android:paddingBottom="57dp"
-    android:id="@+id/coordinator">
+    android:id="@+id/profileCoordinator">
 
     <RelativeLayout
         android:layout_width="match_parent"

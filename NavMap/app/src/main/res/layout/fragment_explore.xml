@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:mapbox="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -7,193 +7,197 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="com.cabandt.navmap.ui.ExploreFragment"
-    android:paddingBottom="57dp">
-
-    <com.mapbox.mapboxsdk.maps.MapView
-        android:id="@+id/mapView"
-        android:layout_height="match_parent"
+    android:paddingBottom="57dp"
+    android:id="@+id/exploreCoordinator">
+    <RelativeLayout
         android:layout_width="match_parent"
-        mapbox:mapbox_cameraZoom="12"/>
-
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cardRouteDetails"
-        android:visibility="gone"
-        android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_alignStart="@id/fab_location_search"
-        android:layout_marginStart="72dp"
-        mapbox:cardCornerRadius="50dp">
-
-        <LinearLayout
-            android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <com.mapbox.mapboxsdk.maps.MapView
+            android:id="@+id/mapView"
             android:layout_height="match_parent"
-            android:orientation="horizontal"
-            android:layout_marginHorizontal="16dp">
+            android:layout_width="match_parent"
+            mapbox:mapbox_cameraZoom="12"/>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardRouteDetails"
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_alignStart="@id/fab_location_search"
+            android:layout_marginStart="72dp"
+            mapbox:cardCornerRadius="50dp">
+
             <LinearLayout
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_weight=".6"
                 android:orientation="horizontal"
-                android:gravity="center_vertical">
-                <TextView
-                    android:id="@+id/tvDistanceLbl"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/dist"
-                    android:textSize="16sp"
-                    android:textColor="@color/darkGrey"
-                    android:layout_marginEnd="5dp"/>
-                <TextView
-                    android:id="@+id/tvDistance"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textSize="16sp"
-                    android:fontFamily="sans-serif-medium"
-                    android:textColor="@color/darkGrey"
-                    android:layout_marginEnd="12dp"/>
+                android:layout_marginHorizontal="16dp">
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight=".6"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+                    <TextView
+                        android:id="@+id/tvDistanceLbl"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/dist"
+                        android:textSize="16sp"
+                        android:textColor="@color/darkGrey"
+                        android:layout_marginEnd="5dp"/>
+                    <TextView
+                        android:id="@+id/tvDistance"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="16sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:textColor="@color/darkGrey"
+                        android:layout_marginEnd="12dp"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight=".5"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+                    <TextView
+                        android:id="@+id/tvDurationLbl"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/time"
+                        android:textSize="16sp"
+                        android:textColor="@color/darkGrey"
+                        android:layout_marginEnd="5dp"/>
+                    <TextView
+                        android:id="@+id/tvDuration"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="16sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:textColor="@color/darkGrey"/>
+                </LinearLayout>
             </LinearLayout>
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight=".5"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
-                <TextView
-                    android:id="@+id/tvDurationLbl"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/time"
-                    android:textSize="16sp"
-                    android:textColor="@color/darkGrey"
-                    android:layout_marginEnd="5dp"/>
-                <TextView
-                    android:id="@+id/tvDuration"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textSize="16sp"
-                    android:fontFamily="sans-serif-medium"
-                    android:textColor="@color/darkGrey"/>
-            </LinearLayout>
-        </LinearLayout>
-    </androidx.cardview.widget.CardView>
+        </androidx.cardview.widget.CardView>
 
-    <Button
-        android:id="@+id/btnStart"
-        android:layout_width="wrap_content"
-        android:layout_height="68dp"
-        android:enabled="false"
-        android:layout_marginStart="16dp"
-        android:layout_marginBottom="10dp"
-        android:layout_marginEnd="72dp"
-        android:textAllCaps="false"
-        android:textSize="18sp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignEnd="@+id/fabBookmarkLocation"
-        android:text="@string/start_navigation"
-        app:cornerRadius="50dp"/>
+        <Button
+            android:id="@+id/btnStart"
+            android:layout_width="wrap_content"
+            android:layout_height="68dp"
+            android:enabled="false"
+            android:layout_marginStart="16dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginEnd="72dp"
+            android:textAllCaps="false"
+            android:textSize="18sp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignEnd="@+id/fabBookmarkLocation"
+            android:text="@string/start_navigation"
+            app:cornerRadius="50dp"/>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabBookmarkLocation"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        mapbox:borderWidth="0dp"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
-        android:enabled="false"
-        app:srcCompat="@drawable/ic_baseline_star_border_24"
-        app:tint="@color/darkGreen"
-        android:contentDescription="@string/search_button" />
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabBookmarkLocation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            mapbox:borderWidth="0dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:enabled="false"
+            app:srcCompat="@drawable/ic_baseline_star_border_24"
+            app:tint="@color/darkGreen"
+            android:contentDescription="@string/search_button" />
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_location_search"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        mapbox:borderWidth="0dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:backgroundTint="@color/white"
-        app:srcCompat="@android:drawable/ic_search_category_default"
-        app:tint="@color/darkGreen"
-        android:contentDescription="@string/search_button" />
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_location_search"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            mapbox:borderWidth="0dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:backgroundTint="@color/white"
+            app:srcCompat="@android:drawable/ic_search_category_default"
+            app:tint="@color/darkGreen"
+            android:contentDescription="@string/search_button" />
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabGoToLocation"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:clickable="true"
-        android:focusable="true"
-        mapbox:borderWidth="0dp"
-        android:layout_above="@id/fabBookmarkLocation"
-        android:layout_alignEnd="@id/fabBookmarkLocation"
-        android:backgroundTint="@color/white"
-        mapbox:srcCompat="@drawable/ic_location"
-        app:tint="@color/darkGreen"
-        android:contentDescription="@string/focus_on_user_location_button" />
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabGoToLocation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:clickable="true"
+            android:focusable="true"
+            mapbox:borderWidth="0dp"
+            android:layout_above="@id/fabBookmarkLocation"
+            android:layout_alignEnd="@id/fabBookmarkLocation"
+            android:backgroundTint="@color/white"
+            mapbox:srcCompat="@drawable/ic_location"
+            app:tint="@color/darkGreen"
+            android:contentDescription="@string/focus_on_user_location_button" />
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabLayerMenu"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:clickable="true"
-        android:focusable="true"
-        mapbox:borderWidth="0dp"
-        android:layout_above="@id/fabGoToLocation"
-        android:layout_alignEnd="@+id/fabGoToLocation"
-        android:backgroundTint="@color/white"
-        mapbox:srcCompat="@drawable/ic_layers"
-        app:tint="@color/darkGreen"
-        android:contentDescription="@string/layer_menu_button" />
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabLayerMenu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:clickable="true"
+            android:focusable="true"
+            mapbox:borderWidth="0dp"
+            android:layout_above="@id/fabGoToLocation"
+            android:layout_alignEnd="@+id/fabGoToLocation"
+            android:backgroundTint="@color/white"
+            mapbox:srcCompat="@drawable/ic_layers"
+            app:tint="@color/darkGreen"
+            android:contentDescription="@string/layer_menu_button" />
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabSatellite"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
-        mapbox:borderWidth="0dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:visibility="gone"
-        android:enabled="false"
-        android:layout_above="@+id/fabTraffic"
-        android:layout_alignEnd="@+id/fabTraffic"
-        mapbox:srcCompat="@drawable/ic_satellite"
-        android:contentDescription="@string/toggle_satellite_view_button" />
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabSatellite"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            mapbox:borderWidth="0dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:visibility="gone"
+            android:enabled="false"
+            android:layout_above="@+id/fabTraffic"
+            android:layout_alignEnd="@+id/fabTraffic"
+            mapbox:srcCompat="@drawable/ic_satellite"
+            android:contentDescription="@string/toggle_satellite_view_button" />
 
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabTraffic"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
-        mapbox:borderWidth="0dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:visibility="gone"
-        android:enabled="false"
-        android:layout_above="@+id/fabStreet"
-        android:layout_alignEnd="@+id/fabStreet"
-        mapbox:srcCompat="@drawable/ic_traffic"
-        android:contentDescription="@string/toggle_traffic_view_button" />
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabTraffic"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            mapbox:borderWidth="0dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:visibility="gone"
+            android:enabled="false"
+            android:layout_above="@+id/fabStreet"
+            android:layout_alignEnd="@+id/fabStreet"
+            mapbox:srcCompat="@drawable/ic_traffic"
+            android:contentDescription="@string/toggle_traffic_view_button" />
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabStreet"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
-        mapbox:borderWidth="0dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:visibility="gone"
-        android:enabled="false"
-        android:layout_above="@+id/fabLayerMenu"
-        android:layout_alignEnd="@+id/fabLayerMenu"
-        mapbox:srcCompat="@drawable/ic_street"
-        android:contentDescription="@string/toggle_street_view_button" />
-</RelativeLayout>
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabStreet"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            mapbox:borderWidth="0dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:visibility="gone"
+            android:enabled="false"
+            android:layout_above="@+id/fabLayerMenu"
+            android:layout_alignEnd="@+id/fabLayerMenu"
+            mapbox:srcCompat="@drawable/ic_street"
+            android:contentDescription="@string/toggle_street_view_button" />
+    </RelativeLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

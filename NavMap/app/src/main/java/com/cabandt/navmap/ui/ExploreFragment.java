@@ -21,7 +21,6 @@ import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
-import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,6 +35,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
@@ -91,6 +91,7 @@ import java.util.concurrent.Executors;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import timber.log.Timber;
 
 
 public class ExploreFragment extends Fragment implements OnMapReadyCallback, PermissionsListener, MapboxMap.OnMapClickListener {
@@ -108,6 +109,7 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
     private FloatingActionButton fabLocationSearch, fabTrackUser, fabBookmarkLocation;
     private CardView cardRouteDetails;
     private TextView tvRouteDist, tvRouteTime;
+    private CoordinatorLayout coordinatorLayout;
 
     private LatLng currentPoint;
     private Geocoder geocoder;
@@ -177,6 +179,8 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
 
         userpref = mAuth.getUid();
         sharedPreferences = activity.getSharedPreferences(userpref, Context.MODE_PRIVATE);
+
+        coordinatorLayout = activity.findViewById(R.id.exploreCoordinator);
 
         getUserSettings();
 
@@ -254,7 +258,7 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
                     //set the components camera
                     locationComponent.setCameraMode(CameraMode.TRACKING_GPS_NORTH);
                 } else {
-                    Toast.makeText(activity, "Unable to Track location", Toast.LENGTH_SHORT).show();
+                    Snackbar.make(coordinatorLayout, "Unable to track location...", Snackbar.LENGTH_INDEFINITE).show();
                 }
             }
         });
@@ -289,46 +293,6 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
         });
     }
 
-    //region load
-    private void loadFromDB()
-    {
-
-        ExecutorService service = Executors.newSingleThreadExecutor();
-        service.execute(new Runnable() {
-            @Override
-            public void run() {
-                //pre-execute
-                activity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        progressDialog = ProgressDialog.show(activity,
-                                "Loading...", "Downloading bookmark data");
-                    }
-                });
-
-                //background
-                try {
-
-                    // do in background
-                } catch (Exception e) {
-                    Log.e(TAG, "Couldn't load bookmarks");
-                    e.printStackTrace();
-                }
-
-                //onPost-execute
-                activity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        progressDialog.dismiss();
-
-                        //do after
-                    }
-                });
-            }
-        });
-    }
-    //endregion
-
     //region save user settings
     public void SaveSharedPreferences()
     {
@@ -338,8 +302,6 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
         editor.putString(unitskey, measurementSystem);
         editor.putString(languagekey,languagePreference);
         editor.commit();
-        //Toast.makeText(activity, "Saved Successfully", Toast.LENGTH_SHORT).show();
-
     }
     //endregion
 
@@ -392,14 +354,14 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
                     .set(bookmark).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void unused) {
-                            Toast.makeText(activity, "Bookmark saved!", Toast.LENGTH_SHORT).show();
+                            Snackbar.make(coordinatorLayout, "Bookmark saved!", Snackbar.LENGTH_SHORT).show();
                             Log.d(TAG, "Bookmark saved to Firebase");
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                            Toast.makeText(activity, "Unable to save Bookmark", Toast.LENGTH_SHORT).show();
+                            Snackbar.make(coordinatorLayout, "Error - unable to save bookmark...", Snackbar.LENGTH_LONG).show();
                             Log.w(TAG, "Failed to save Bookmark to Firebase: " + e.getMessage());
                             e.printStackTrace();
                         }
@@ -407,7 +369,7 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
 
 
         } catch (Exception e) {
-            Toast.makeText(activity, "Unable to save Bookmark", Toast.LENGTH_SHORT).show();
+            Snackbar.make(coordinatorLayout, "Error - unable to save bookmark...", Snackbar.LENGTH_LONG).show();
             Log.w(TAG, "Unable to save bookmark!");
             e.printStackTrace();
         }
@@ -551,6 +513,8 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
             enableLocationComponent(style);
             addDestinationIconSymbolLayer(style);
             mapboxMap.addOnMapClickListener(this);
+            navigationMapRoute = new NavigationMapRoute(null, mapView, mapboxMap,
+                        com.mapbox.services.android.navigation.ui.v5.R.style.NavigationMapRoute);
 
             btnStartNavigation = activity.findViewById(R.id.btnStart);
             btnStartNavigation.setOnClickListener(v -> {
@@ -589,9 +553,14 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
     private void initSearchFab() {
         fabLocationSearch = activity.findViewById(R.id.fab_location_search);
         fabLocationSearch.setOnClickListener(view -> {
+            Point currentLocation = Point.fromLngLat(
+                    locationComponent.getLastKnownLocation().getLongitude(),
+                    locationComponent.getLastKnownLocation().getLatitude());
+
             Intent intent = new PlaceAutocomplete.IntentBuilder()
                     .accessToken(Mapbox.getAccessToken() != null ? Mapbox.getAccessToken() : getString(R.string.mapbox_access_token))
                     .placeOptions(PlaceOptions.builder()
+                            .proximity(currentLocation)
                             .backgroundColor(Color.parseColor("#EEEEEE"))
                             .limit(10)
                             .build(PlaceOptions.MODE_CARDS))
@@ -684,6 +653,7 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
                             Log.d(TAG, "No routes found, make sure you set the right user and access token.");
                             return;
                         } else if (response.body().routes().size() < 1){
+                            Snackbar.make(coordinatorLayout, "Error - No routes found...", Snackbar.LENGTH_LONG).show();
                             Log.e(TAG, "No routes found");
                             return;
                         }
@@ -696,12 +666,7 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
                         if (navigationMapRoute != null){
                             navigationMapRoute.removeRoute();
                         }
-                        else
-                        {
-                            navigationMapRoute = new NavigationMapRoute(
-                                    null, mapView, mapboxMap,
-                                    com.mapbox.services.android.navigation.ui.v5.R.style.NavigationMapRoute);
-                        }
+
                         navigationMapRoute.addRoute(currentRoute);
                     }
 
@@ -782,7 +747,7 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
     //#region implementation methods
     @Override
     public void onExplanationNeeded(List<String> list) {
-        Toast.makeText(activity,R.string.user_location_permission_explanation, Toast.LENGTH_SHORT).show();
+        Snackbar.make(coordinatorLayout, R.string.user_location_permission_explanation, Snackbar.LENGTH_INDEFINITE).show();
     }
 
     @Override
@@ -790,7 +755,7 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
         if (granted){
             enableLocationComponent(mapboxMap.getStyle());
         } else {
-            Toast.makeText(activity, R.string.user_location_permission_not_granted, Toast.LENGTH_SHORT).show();
+            Snackbar.make(coordinatorLayout, R.string.user_location_permission_not_granted, Snackbar.LENGTH_INDEFINITE).show();
             //finish();
         }
     }
