@@ -30,10 +30,12 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
@@ -104,6 +106,8 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
     private NavigationMapRoute navigationMapRoute;
     private Button btnStartNavigation;
     private FloatingActionButton fabLocationSearch, fabTrackUser, fabBookmarkLocation;
+    private CardView cardRouteDetails;
+    private TextView tvRouteDist, tvRouteTime;
 
     private LatLng currentPoint;
     private Geocoder geocoder;
@@ -201,6 +205,10 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
         fabTraffic.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(activity, R.color.grey)));
         fabBookmarkLocation.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(activity, R.color.semiTransparentGrey)));
         //endregion
+
+        cardRouteDetails = activity.findViewById(R.id.cardRouteDetails);
+        tvRouteTime = activity.findViewById(R.id.tvDuration);
+        tvRouteDist = activity.findViewById(R.id.tvDistance);
 
         //region layer Fab onClickListeners
         fabMenu.setOnClickListener(new View.OnClickListener() {
@@ -682,6 +690,8 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
 
                         currentRoute = response.body().routes().get(0);
 
+                        setDistanceAndTime();
+
                         // Draw the route on the map
                         if (navigationMapRoute != null){
                             navigationMapRoute.removeRoute();
@@ -700,6 +710,54 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
                         Log.e(TAG, "Error: " + t.getMessage());
                     }
                 });
+    }
+
+    public void setDistanceAndTime(){
+        Double distInMeters = currentRoute.distance();
+        Double dist;
+        if (measurementSystem.equals("metric"))
+        {
+            if (distInMeters > 10000){
+                dist = distInMeters/1000;
+                dist = Double.valueOf(Math.round(dist));
+                tvRouteDist.setText(dist.intValue() + " km");
+            } else {
+                dist = distInMeters/10;
+                dist = Double.valueOf(Math.round(dist));
+                dist /= 100;
+                tvRouteDist.setText(dist + " km");
+            }
+        } else {
+            dist = distInMeters/1609.33;
+            if (distInMeters > 16090){
+                dist = Double.valueOf(Math.round(dist));
+                tvRouteDist.setText(dist.intValue() + " miles");
+            } else {
+                dist *= 100;
+                dist = Double.valueOf(Math.round(dist));
+                dist /= 100;
+                tvRouteDist.setText(dist + " miles");
+            }
+        }
+
+        Double time = currentRoute.duration()/60;
+        if (time % 10 >= 5){
+            time ++;
+        }
+        time = Double.valueOf(Math.round(time));
+
+        String duration;
+        if (time > 60){
+            int hours = (int)(time/60);
+            int mins = time.intValue() - (hours * 60);
+
+            duration = hours + "h " + mins + " m";
+        } else {
+            duration = time.intValue() + " mins";
+        }
+        tvRouteTime.setText(duration);
+
+        cardRouteDetails.setVisibility(View.VISIBLE);
     }
 
     @SuppressLint("MissingPermission")

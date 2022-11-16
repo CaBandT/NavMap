@@ -300,18 +300,31 @@ public class BookmarkViewActivity extends AppCompatActivity implements OnMapRead
     }
 
     public void setDistanceAndTime(){
+        Double distInMeters = currentRoute.distance();
+        Double dist;
         if (measurementSystem.equals("metric"))
         {
-            Double dist = currentRoute.distance()/10;
-            dist = Double.valueOf(Math.round(dist));
-            dist /= 100;
-            tvDistance.setText(dist + " km");
+            if (distInMeters > 10000){
+                dist = distInMeters/1000;
+                dist = Double.valueOf(Math.round(dist));
+                tvDistance.setText(dist.intValue() + " km");
+            } else {
+                dist = distInMeters/10;
+                dist = Double.valueOf(Math.round(dist));
+                dist /= 100;
+                tvDistance.setText(dist + " km");
+            }
         } else {
-            Double dist = currentRoute.distance()/1609.33;
-            dist *= 100;
-            dist = Double.valueOf(Math.round(dist));
-            dist /= 100;
-            tvDistance.setText(dist + " miles");
+            dist = distInMeters/1609.33;
+            if (distInMeters > 16090){
+                dist = Double.valueOf(Math.round(dist));
+                tvDistance.setText(dist.intValue() + " miles");
+            } else {
+                dist *= 100;
+                dist = Double.valueOf(Math.round(dist));
+                dist /= 100;
+                tvDistance.setText(dist + " miles");
+            }
         }
 
         Double time = currentRoute.duration()/60;
@@ -320,7 +333,15 @@ public class BookmarkViewActivity extends AppCompatActivity implements OnMapRead
         }
         time = Double.valueOf(Math.round(time));
 
-        String duration = time.intValue() + " mins";
+        String duration;
+        if (time > 60){
+            int hours = (int)(time/60);
+            int mins = time.intValue() - (hours * 60);
+
+            duration = hours + "h " + mins + " m";
+        } else {
+            duration = time.intValue() + " mins";
+        }
         tvDuration.setText(duration);
     }
 

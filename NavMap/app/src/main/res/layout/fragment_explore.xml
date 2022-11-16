@@ -15,6 +15,70 @@
         android:layout_width="match_parent"
         mapbox:mapbox_cameraZoom="12"/>
 
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardRouteDetails"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_alignStart="@id/fab_location_search"
+        android:layout_marginStart="72dp"
+        mapbox:cardCornerRadius="50dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:layout_marginHorizontal="16dp">
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight=".6"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+                <TextView
+                    android:id="@+id/tvDistanceLbl"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/dist"
+                    android:textSize="16sp"
+                    android:textColor="@color/darkGrey"
+                    android:layout_marginEnd="5dp"/>
+                <TextView
+                    android:id="@+id/tvDistance"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:textColor="@color/darkGrey"
+                    android:layout_marginEnd="12dp"/>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight=".5"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+                <TextView
+                    android:id="@+id/tvDurationLbl"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/time"
+                    android:textSize="16sp"
+                    android:textColor="@color/darkGrey"
+                    android:layout_marginEnd="5dp"/>
+                <TextView
+                    android:id="@+id/tvDuration"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:textColor="@color/darkGrey"/>
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
     <Button
         android:id="@+id/btnStart"
         android:layout_width="wrap_content"
@@ -50,7 +114,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         mapbox:borderWidth="0dp"
-        android:layout_marginLeft="16dp"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:backgroundTint="@color/white"
         app:srcCompat="@android:drawable/ic_search_category_default"
