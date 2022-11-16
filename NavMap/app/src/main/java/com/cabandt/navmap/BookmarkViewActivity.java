@@ -8,6 +8,7 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconOffset;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.content.res.ResourcesCompat;
 
 import android.annotation.SuppressLint;
@@ -24,12 +25,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.cabandt.navmap.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.mapbox.android.core.permissions.PermissionsListener;
@@ -69,6 +70,7 @@ public class BookmarkViewActivity extends AppCompatActivity implements OnMapRead
     private NavigationMapRoute navigationMapRoute;
     private String geoJsonSourceLayerId = "GeoJsonSourceLayerId";
     private String symbolIconId="SymbolIconId";
+    private CoordinatorLayout coordinatorLayout;
 
     private Button btnStartNavigation;
     private FloatingActionButton fabDeleteBookmark;
@@ -120,6 +122,7 @@ public class BookmarkViewActivity extends AppCompatActivity implements OnMapRead
         tvDistance = findViewById(R.id.tvBookmarkDistance);
         fabDeleteBookmark = findViewById(R.id.fabDeleteBookmark);
         progressBar = findViewById(R.id.bookmarkViewProgressBar);
+        coordinatorLayout = findViewById(R.id.bookmarkViewCoordinator);
 
         //Firebase instantiations
         mAuth = FirebaseAuth.getInstance();
@@ -170,7 +173,7 @@ public class BookmarkViewActivity extends AppCompatActivity implements OnMapRead
                                     @Override
                                     public void onSuccess(Void unused) {
                                         progressBar.setVisibility(View.GONE);
-                                        Toast.makeText(BookmarkViewActivity.this, "Bookmark Deleted", Toast.LENGTH_SHORT).show();
+                                        Snackbar.make(coordinatorLayout, "Bookmark deleted...", Snackbar.LENGTH_SHORT);
 
                                         Intent intent = new Intent(BookmarkViewActivity.this, NavMain.class);
                                         startActivity(intent);
@@ -270,7 +273,7 @@ public class BookmarkViewActivity extends AppCompatActivity implements OnMapRead
                             Log.d(TAG, "No routes found, make sure you set the right user and access token.");
                             return;
                         } else if (response.body().routes().size() < 1){
-                            Toast.makeText(BookmarkViewActivity.this, "No Routes Found", Toast.LENGTH_SHORT).show();
+                            Snackbar.make(coordinatorLayout, "No routes found...", Snackbar.LENGTH_INDEFINITE);
                             Log.e(TAG, "No routes found");
                             return;
                         }
@@ -378,7 +381,7 @@ public class BookmarkViewActivity extends AppCompatActivity implements OnMapRead
 
     @Override
     public void onExplanationNeeded(List<String> permissionsToExplain) {
-        Toast.makeText(this, R.string.user_location_permission_explanation, Toast.LENGTH_SHORT).show();
+        Snackbar.make(coordinatorLayout, R.string.user_location_permission_explanation, Snackbar.LENGTH_INDEFINITE);
     }
 
     @Override
@@ -386,8 +389,8 @@ public class BookmarkViewActivity extends AppCompatActivity implements OnMapRead
         if (granted){
             enableLocationComponent(mapboxMap.getStyle());
         } else {
-            Toast.makeText(this, R.string.user_location_permission_not_granted, Toast.LENGTH_SHORT).show();
-            finish();
+            Snackbar.make(coordinatorLayout, R.string.user_location_permission_not_granted, Snackbar.LENGTH_INDEFINITE);
+            //finish();
         }
     }
 
