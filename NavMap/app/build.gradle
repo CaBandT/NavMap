@@ -62,4 +62,6 @@ dependencies {
     //places
     implementation 'com.mapbox.mapboxsdk:mapbox-android-plugin-places-v9:0.12.0'
 
+    //languages
+    implementation 'com.mapbox.mapboxsdk:mapbox-android-plugin-localization-v9:0.12.0'
 }

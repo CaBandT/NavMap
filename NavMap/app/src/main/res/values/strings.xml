@@ -71,6 +71,10 @@
     </string-array>
     <string-array name="languageTypes">
         <item>English</item>
-        <item>Zulu</item>
+        <item>Chinese</item>
+        <item>French</item>
+        <item>German</item>
+        <item>Japanese</item>
+        <item>Korean</item>
     </string-array>
 </resources>
