@@ -45,6 +45,8 @@ import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.Style;
+import com.mapbox.mapboxsdk.plugins.localization.LocalizationPlugin;
+import com.mapbox.mapboxsdk.plugins.localization.MapLocale;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.utils.BitmapUtils;
@@ -54,6 +56,7 @@ import com.mapbox.services.android.navigation.ui.v5.route.NavigationMapRoute;
 import com.mapbox.services.android.navigation.v5.navigation.NavigationRoute;
 
 import java.util.List;
+import java.util.Locale;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -69,6 +72,7 @@ public class BookmarkViewActivity extends AppCompatActivity implements OnMapRead
     private NavigationMapRoute navigationMapRoute;
     private String geoJsonSourceLayerId = "GeoJsonSourceLayerId";
     private String symbolIconId="SymbolIconId";
+    private LocalizationPlugin localizationPlugin;
 
     private Button btnStartNavigation;
     private FloatingActionButton fabDeleteBookmark;
@@ -93,6 +97,9 @@ public class BookmarkViewActivity extends AppCompatActivity implements OnMapRead
     private String landmarkPreference;
     private String measurementSystem;
     private String languagePreference;
+
+    private String mapLanguage = MapLocale.ENGLISH;
+    private Locale navLanguage = Locale.ENGLISH;
 
     private boolean locationPerms = false;
 
@@ -132,11 +139,11 @@ public class BookmarkViewActivity extends AppCompatActivity implements OnMapRead
             measurementSystem = sharedPreferences.getString(unitskey,"");
             landmarkPreference = sharedPreferences.getString(landemarkkey,"");
             languagePreference = sharedPreferences.getString(languagekey,"");
+            setLanguage();
         } catch (Exception ex){
             Log.e(TAG, "Couldn't read ");
             ex.printStackTrace();
         }
-
 
         tvName.setText(name);
         tvLat.setText("" + lat);
@@ -196,6 +203,8 @@ public class BookmarkViewActivity extends AppCompatActivity implements OnMapRead
         mapboxMap.setStyle(Style.MAPBOX_STREETS, style -> {
             enableLocationComponent(style);
             addDestinationIconSymbolLayer(style);
+            localizationPlugin = new LocalizationPlugin(mapView, mapboxMap, style);
+            localizationPlugin.setMapLanguage(mapLanguage);
 
             generateRoute();
 
@@ -219,6 +228,35 @@ public class BookmarkViewActivity extends AppCompatActivity implements OnMapRead
             Bitmap bitmap = BitmapUtils.getBitmapFromDrawable(drawable);
             style.addImage(symbolIconId, bitmap);
         });
+    }
+
+    private void setLanguage() {
+        switch (languagePreference){
+            case "Chinese":
+                mapLanguage = MapLocale.CHINESE;
+                navLanguage = Locale.CHINESE;
+                break;
+            case "French":
+                mapLanguage = MapLocale.FRENCH;
+                navLanguage = Locale.FRENCH;
+                break;
+            case "German":
+                mapLanguage = MapLocale.GERMAN;
+                navLanguage = Locale.GERMAN;
+                break;
+            case "Japanese":
+                mapLanguage = MapLocale.JAPANESE;
+                navLanguage = Locale.JAPANESE;
+                break;
+            case "Korean":
+                mapLanguage = MapLocale.KOREAN;
+                navLanguage = Locale.KOREAN;
+                break;
+            default:
+                mapLanguage = MapLocale.ENGLISH;
+                navLanguage = Locale.ENGLISH;
+                break;
+        }
     }
 
     private void setUpLayer(Style loadedMapStyle) {
@@ -259,6 +297,7 @@ public class BookmarkViewActivity extends AppCompatActivity implements OnMapRead
                 .origin(originPoint)
                 .destination(destinationPoint)
                 .voiceUnits(measurementSystem)
+                .language(navLanguage)
                 .build()
                 .getRoute(new Callback<DirectionsResponse>() {
                     @Override
