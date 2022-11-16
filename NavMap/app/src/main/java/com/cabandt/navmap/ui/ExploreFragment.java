@@ -69,6 +69,8 @@ import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.Style;
+import com.mapbox.mapboxsdk.plugins.localization.LocalizationPlugin;
+import com.mapbox.mapboxsdk.plugins.localization.MapLocale;
 import com.mapbox.mapboxsdk.plugins.places.autocomplete.PlaceAutocomplete;
 import com.mapbox.mapboxsdk.plugins.places.autocomplete.model.PlaceOptions;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
@@ -105,6 +107,8 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
     private LocationComponent locationComponent;
     private DirectionsRoute currentRoute;
     private NavigationMapRoute navigationMapRoute;
+    private LocalizationPlugin localizationPlugin;
+
     private Button btnStartNavigation;
     private FloatingActionButton fabLocationSearch, fabTrackUser, fabBookmarkLocation;
     private CardView cardRouteDetails;
@@ -147,8 +151,10 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
     private String measurementSystem;
     private String languagePreference;
 
-    //firebase stuff
+    private String mapLanguage = MapLocale.ENGLISH;
+    private Locale navLanguage = Locale.ENGLISH;
 
+    //firebase stuff
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
     private String userUid;
@@ -302,6 +308,8 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
         editor.putString(unitskey, measurementSystem);
         editor.putString(languagekey,languagePreference);
         editor.commit();
+
+        setLanguage();
     }
     //endregion
 
@@ -512,6 +520,9 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
         mapboxMap.setStyle(Style.MAPBOX_STREETS, style -> {
             enableLocationComponent(style);
             addDestinationIconSymbolLayer(style);
+            localizationPlugin = new LocalizationPlugin(mapView, mapboxMap, style);
+            localizationPlugin.setMapLanguage(mapLanguage);
+
             mapboxMap.addOnMapClickListener(this);
             //navigationMapRoute = new NavigationMapRoute(null, mapView, mapboxMap,
                         //com.mapbox.services.android.navigation.ui.v5.R.style.NavigationMapRoute);
@@ -539,6 +550,37 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
             style.addImage(symbolIconId, bitmap);
         });
     }
+
+    //region switch language
+    private void setLanguage() {
+        switch (languagePreference){
+            case "Chinese":
+                mapLanguage = MapLocale.CHINESE;
+                navLanguage = Locale.CHINESE;
+                break;
+            case "French":
+                mapLanguage = MapLocale.FRENCH;
+                navLanguage = Locale.FRENCH;
+                break;
+            case "German":
+                mapLanguage = MapLocale.GERMAN;
+                navLanguage = Locale.GERMAN;
+                break;
+            case "Japanese":
+                mapLanguage = MapLocale.JAPANESE;
+                navLanguage = Locale.JAPANESE;
+                break;
+            case "Korean":
+                mapLanguage = MapLocale.KOREAN;
+                navLanguage = Locale.KOREAN;
+                break;
+            default:
+                mapLanguage = MapLocale.ENGLISH;
+                navLanguage = Locale.ENGLISH;
+                break;
+        }
+    }
+    //endregion
 
     private void setUpLayer(Style loadedMapStyle) {
         loadedMapStyle.addLayer(new SymbolLayer("SYMBOL_LAYER_ID", geoJsonSourceLayerId)
@@ -648,6 +690,7 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
                 .origin(origin)
                 .destination(destination)
                 .voiceUnits(measurementSystem)
+                .language(navLanguage)
                 .build()
                 .getRoute(new Callback<DirectionsResponse>() {
                     @Override

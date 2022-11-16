@@ -29,8 +29,10 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.mapbox.mapboxsdk.plugins.localization.MapLocale;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public class ProfileFragment extends Fragment {
@@ -219,15 +221,25 @@ public class ProfileFragment extends Fragment {
                 break;
         }
 
-        switch (languagePreference)
-        {
-            case "Zulu":
+        switch (languagePreference){
+            case "Chinese":
                 languageSpinner.setSelection(1);
+                break;
+            case "French":
+                languageSpinner.setSelection(2);
+                break;
+            case "German":
+                languageSpinner.setSelection(3);
+                break;
+            case "Japanese":
+                languageSpinner.setSelection(4);
+                break;
+            case "Korean":
+                languageSpinner.setSelection(5);
                 break;
             default:
                 languageSpinner.setSelection(0);
                 break;
-
         }
     }
 
