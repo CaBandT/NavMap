@@ -20,6 +20,7 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
+import android.opengl.Visibility;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -176,8 +177,6 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
     @Override
     public void onStart() {
         super.onStart();
-        //shared Preferences
-
         //Firebase instantiations
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
@@ -190,9 +189,8 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
 
         getUserSettings();
 
-        //start map
         mapView = activity.findViewById(R.id.mapView);
-        mapView.onCreate(_savedInstanceState);
+        //mapView.onCreate(_savedInstanceState);
         mapView.getMapAsync(this);
 
         //region instantiations and set up required for layers
@@ -220,6 +218,7 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
         tvRouteTime = activity.findViewById(R.id.tvDuration);
         tvRouteDist = activity.findViewById(R.id.tvDistance);
 
+        //region onClickListeners
         //region layer Fab onClickListeners
         fabMenu.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -256,7 +255,7 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
         });
         //endregion
 
-        //region Track Location onClickListener
+        //Track Location onClickListener
         fabTrackUser.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -268,8 +267,8 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
                 }
             }
         });
-        //endregion
-        
+
+        //Bookmark location onClickListener
         fabBookmarkLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -297,6 +296,7 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
                 dialog.show();
             }
         });
+        //endregion
     }
 
     //region save user settings
@@ -314,7 +314,6 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
     //endregion
 
     //region get users setting
-
     private void getUserSettings()
     {
         try {
@@ -327,12 +326,17 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
                             if (task.isSuccessful()) {
                                 DocumentSnapshot document = task.getResult();
                                 if (document.exists()) {
-                                     Log.d(TAG, "Snapshot data" + document.getData());
-                                     landmarkPreference = document.get("landmarkPreference").toString();
-                                     measurementSystem = document.get("measurementSystem").toString();
-                                     languagePreference = document.get("languagePreference").toString();
+                                    Log.d(TAG, "Snapshot data" + document.getData());
+                                    landmarkPreference = document.get("landmarkPreference").toString();
+                                    measurementSystem = document.get("measurementSystem").toString();
+                                    languagePreference = document.get("languagePreference").toString();
 
                                     SaveSharedPreferences();
+
+                                    if (mapboxMap.getStyle() != null){
+                                        localizationPlugin = new LocalizationPlugin(mapView, mapboxMap, mapboxMap.getStyle());
+                                        localizationPlugin.setMapLanguage(mapLanguage);
+                                    }
                                 } else {
                                     Log.w(TAG, "Mate thats an L");
                                 }
@@ -346,8 +350,9 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
             ex.printStackTrace();
         }
     }
+    //endregion
 
-
+    //region save bookmark to firebase
     private void saveBookmarkToFirebase(String name, String lat, String lng) {
         try {
             Map<String, Object> bookmark = new HashMap<>();
@@ -382,6 +387,7 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
             e.printStackTrace();
         }
     }
+    //endregion
 
     //region layer methods
     private void onMenuButtonClicked()
@@ -524,8 +530,6 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
             localizationPlugin.setMapLanguage(mapLanguage);
 
             mapboxMap.addOnMapClickListener(this);
-            //navigationMapRoute = new NavigationMapRoute(null, mapView, mapboxMap,
-                        //com.mapbox.services.android.navigation.ui.v5.R.style.NavigationMapRoute);
 
             btnStartNavigation = activity.findViewById(R.id.btnStart);
             btnStartNavigation.setOnClickListener(v -> {
