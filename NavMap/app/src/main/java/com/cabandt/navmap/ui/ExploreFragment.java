@@ -190,10 +190,7 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
 
         getUserSettings();
 
-        //start map
-        mapView = activity.findViewById(R.id.mapView);
-        mapView.onCreate(_savedInstanceState);
-        mapView.getMapAsync(this);
+        initialiseMap();
 
         //region instantiations and set up required for layers
         //fab animations
@@ -313,8 +310,14 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
     }
     //endregion
 
-    //region get users setting
+    private void initialiseMap(){
+        //start map
+        mapView = activity.findViewById(R.id.mapView);
+        mapView.onCreate(_savedInstanceState);
+        mapView.getMapAsync(this);
+    }
 
+    //region get users setting
     private void getUserSettings()
     {
         try {
@@ -327,12 +330,17 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
                             if (task.isSuccessful()) {
                                 DocumentSnapshot document = task.getResult();
                                 if (document.exists()) {
-                                     Log.d(TAG, "Snapshot data" + document.getData());
-                                     landmarkPreference = document.get("landmarkPreference").toString();
-                                     measurementSystem = document.get("measurementSystem").toString();
-                                     languagePreference = document.get("languagePreference").toString();
+                                    Log.d(TAG, "Snapshot data" + document.getData());
+                                    landmarkPreference = document.get("landmarkPreference").toString();
+                                    measurementSystem = document.get("measurementSystem").toString();
+                                    languagePreference = document.get("languagePreference").toString();
 
                                     SaveSharedPreferences();
+
+                                    if (mapboxMap.getStyle() != null){
+                                        localizationPlugin = new LocalizationPlugin(mapView, mapboxMap, mapboxMap.getStyle());
+                                        localizationPlugin.setMapLanguage(mapLanguage);
+                                    }
                                 } else {
                                     Log.w(TAG, "Mate thats an L");
                                 }
