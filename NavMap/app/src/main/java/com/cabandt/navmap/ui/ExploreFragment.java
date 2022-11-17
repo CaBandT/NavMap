@@ -146,6 +146,7 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback, Per
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
     private String userUid;
+    int p1;
 
     private final String TAG = "fragment_explore";
 
